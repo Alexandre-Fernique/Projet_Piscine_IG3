@@ -1,0 +1,13 @@
+{
+  "name": "Projet_git",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http-errors": "latest",
+    "morgan": "^1.10.0",
+    "debug": "latest"
+  },
+  "devDependencies": {
+    "cookie-parser": "^1.4.5"
+  }
+}
