@@ -2,10 +2,11 @@
   "name": "Projet_git",
   "version": "1.0.0",
   "dependencies": {
+    "debug": "latest",
     "express": "^4.17.1",
     "http-errors": "latest",
     "morgan": "^1.10.0",
-    "debug": "latest"
+    "pug": "^3.0.0"
   },
   "devDependencies": {
     "cookie-parser": "^1.4.5"
