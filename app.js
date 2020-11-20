@@ -17,7 +17,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 // Cette partie est utile dans l'URL pour le premier appel et savoir vers quel routeur il va rediriger
 // C'est similaire au routeur qui redirige l'utilisateur vers le bon controlleur
