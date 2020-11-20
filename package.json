@@ -1,5 +1,5 @@
 {
-  "name": "Projet_git",
+  "name": "projet_git",
   "version": "1.0.0",
   "dependencies": {
     "debug": "latest",
@@ -10,5 +10,20 @@
   },
   "devDependencies": {
     "cookie-parser": "^1.4.5"
-  }
+  },
+  "description": "- config : Information pour la connexion à la base de donnée\r - model : Fonction de communication avec la base de données\r - view : Fichier pour l'affichage à l'utilisateur\r - controller : Fichier faisant le lien entre view et model, avec du traitement de données \r - lib : Fichier utile pour le site",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julien-vendran/Projet_Piscine_IG3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/julien-vendran/Projet_Piscine_IG3/issues"
+  },
+  "homepage": "https://github.com/julien-vendran/Projet_Piscine_IG3#readme"
 }
