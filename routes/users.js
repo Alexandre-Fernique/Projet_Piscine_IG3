@@ -8,7 +8,9 @@ var router = express.Router();
 // C'est similaire aux controlleur (ControlleurUtilisateur ici) qui redirige l'utilisateur vers la bonne fonction
 // www.exemple.fr/user/cequonveut
 
-router.get('/', function(req, res, next) { //Page d'acueil de la partie utilisateur
+//localhost:3000/users/list
+
+router.get('/list', function(req, res, next) { //Page d'acueil de la partie utilisateur
     res.status(200).sendFile(__dirname +  '/view/users.html');
 });
 
