@@ -22,8 +22,8 @@ app.use(express.static(path.join(__dirname, '/public')));
 // Cette partie est utile dans l'URL pour le premier appel et savoir vers quel routeur il va rediriger
 // C'est similaire au routeur qui redirige l'utilisateur vers le bon controlleur
 // www.exemple.fr/user
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/', indexRouter); //localhost:3000/
+app.use('/users', usersRouter); //localhost:3000/users
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
