@@ -22,6 +22,15 @@ router.get('/inscrit', function(req, res, next) {
     //res.status(200).sendFile(__dirname +  '/view/connexion.html'); -> Pour envoyer un fichier html
     //res.render('index', { title: 'Express' }); -> Si on veut utiliser pug
 });
+router.get('/user', function(req, res, next) {
+    fs.readFile(__dirname +  '/view/User/Accueil_User.html', (err, template) => { //Page de connexion -> Utilisateur non connecté
+        if (err)
+            throw err;
+        res.end(template)
+    });
+    //res.status(200).sendFile(__dirname +  '/view/connexion.html'); -> Pour envoyer un fichier html
+    //res.render('index', { title: 'Express' }); -> Si on veut utiliser pug
+});
 
 module.exports = router;
 
