@@ -18,14 +18,14 @@ body {
 
 .form-signin {
     width: 100%;
-    max-width: 330px;
+    max-width: 700px;
     padding: 15px 30px 15px 30px;
     margin: auto;
     background-color: #f5f5f5;
     border-radius: 20px;
     box-shadow: 2px 2px 12px black;
-
 }
+
 .form-signin .checkbox {
     font-weight: 400;
 }
@@ -35,12 +35,40 @@ body {
     height: auto;
     padding: 10px;
     font-size: 16px;
+    margin-bottom: 10px;
+}
+.form-signin select{
+    position: relative;
+    box-sizing: border-box;
+    height: auto;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
 }
 .form-signin .form-control:focus {
     z-index: 2;
 }
 
-.form-signin input{
-    margin-bottom: 10px;
+.form-signin button{
+    max-width: 330px;
+    margin: auto;
+}
 
+/* Pour la page user et la mise en forme du tableau à voir pour mettre dans un autre css*/
+.divtabel{
+    background-color: inherit;
+    width: 75%;
+    margin: auto;
+}
+th[scope="row"]{
+    background-color: #f5f5f5;
+    padding: 0;
+}
+.table{
+    margin: 0;
+    border:4px solid #343a40;
+}
+.table td{
+    height: 49px;
+    border: 1px solid #dee2e6
 }
