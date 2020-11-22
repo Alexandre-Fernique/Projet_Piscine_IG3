@@ -1,13 +1,27 @@
-const { Pool } = require('pg');
+/**
+ * Ce fichier gère la connexion à la base de donnée
+ */
+const mysql = require('mysql');
 
-const pool = new Pool({
-    user: "postgres",
+
+/*
+ * Création d'une instance pour communiquer avec la base de données
+ */
+
+var db = mysql.createConnection({
     host: "localhost",
-    database: "postgres",
-    password: "123456",
-    port: 5432
+    user: "root",
+    password: "",
+    database: "projet_piscine"
 });
-pool.connect();
+
+db.connect(function(err) {
+    if (err)
+        throw err;
+    console.log("Connecté à la base de données MySQL!") ;
+});
+
+// Si on arrive là alors la conenxion s'est bien passée
 console.log("Connexion réussie à la base de données");
 
-module.exports = pool;
+module.exports = mysql;
