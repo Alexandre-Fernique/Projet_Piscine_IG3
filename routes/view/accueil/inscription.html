@@ -7,49 +7,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <link rel="stylesheet" href="stylesheets/inscription.css">
+    <link rel="stylesheet" href="stylesheets/connexion.css">
+
 </head>
 <body class="text-center">
 <form class="form-signin">
-    <img class="mb-4" src="images/IG.png" alt="" width="25%" height="25%">
+    <img class="mb-4" src="images/um.png" alt="" width="72" height="72">
 
     <h1 class="h3 mb-3 font-weight-normal">
-        S'inscrire
+        Remplissez les informations
     </h1>
-    <div class="form-row" >
-        <div class="col">
-            <label for="inputNom" class="sr-only">Nom</label>
-            <input type="text"  id="inputNom" class="form-control" placeholder="Nom" required>
-            <label for="inputEmail" class="sr-only">Nom</label>
-            <input type="email"  id="inputEmail" class="form-control" placeholder="Adresse mail" required autofocus>
-            <label for="inputMdp" class="sr-only">Nom</label>
-            <input type="password" id="inputMdp" class="form-control" placeholder="Mot de passe" required>
+    <label for="inputEmail" class="sr-only">
+        Mettre les bons éléments
+    </label>
+    <input type="email" id="inputEmail" class="form-control" placeholder="Mettre les bons éléments" required autofocus>
 
+    <label for="inputPassword" class="sr-only">
+        Mettre les bons éléments
+    </label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Mettre les bons éléments" required>
 
-        </div>
-        <div class="col" >
-            <label for="inputPrenom" class="sr-only">Nom</label>
-            <input type="text"  id="inputPrenom" class="form-control" placeholder="Prénom" required>
-            <label for="selectPromo" class="sr-only">Nom</label>
-            <select class="custom-select" id="selectPromo">
-                <option selected disabled>Choisi ta promo</option>
-                <option value="1">IG3</option>
-                <option value="2">IG4</option>
-                <option value="3">IG5</option>
-            </select>
-            <label for="inputConfMdp" class="sr-only">Nom</label>
-            <input type="password" id="inputConfMdp" class="form-control" placeholder="Confirmer Mot de passe" required>
-
-        </div>
-    </div>
     <div class="checkbox mb-3">
         <p>Déjà inscrit ? <a href="/">Cliquez ici</a></p>
-
     </div>
     <button class="btn btn-lg btn-primary btn-block" type="submit">
         Valider
     </button>
-
     <p class="mt-5 mb-3 text-muted">Groupe 1 - Polytech Montpellier</p>
 </form>
 </body>
