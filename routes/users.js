@@ -1,6 +1,6 @@
-// Equivalent des controlleurs
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
 
 /* GET users listing. */
 
@@ -10,7 +10,15 @@ var router = express.Router();
 
 //localhost:3000/users/list
 
-router.get('/list', function(req, res, next) { //Page d'acueil de la partie utilisateur
+router.get('/', function(req, res, next) { //Page d'accueil utilisateur
+    fs.readFile(__dirname +  '/view/User/Accueil_User.html', (err, template) => { //Page d'accueil -> Utilisateur connecté
+        if (err)
+            throw err;
+        res.end(template)
+    });
+});
+
+router.get('/list', function(req, res, next) {
     res.status(200).sendFile(__dirname +  '/view/users.html');
 });
 
