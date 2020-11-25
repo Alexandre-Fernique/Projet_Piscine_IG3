@@ -56,4 +56,32 @@ router.get("/inscription", (req, res, next) => {
     res.end("J'ai fini"); //Retourner une page d'inscription terminée
 });
 
+/*
+Gérer la redirection de l'utilisateur en fonction de ce qui a été capté :
+    - Adresse mail non reconnue (On utilise plutôt le numéro étudiant parce que c'est notre clé primaire ?)
+    - Mauvais mot de passe
+    - Utilisateur connecté
+ */
+router.get("/connexion", (req, res, next) => {
+    let mail = req.query.Email;
+    //console.log("MON MAIL : " + mail);
+    let mdp = cle + req.query.mdp;
+    //console.log(mdp);
+    //let mdp = req.query.mdp;
+    let sql = "SELECT `motDePasse` FROM `etudiants` WHERE mail=?";
+    let values = [mail];
+    db.query(sql, values, (err, result) => {
+        if (err)
+            throw err;
+        if (result[0] == null ) {
+            res.end("mail"); //Adresse mail inexistante
+        } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
+            res.end("Connecté"); //L'utilisateur est connecté
+        } else {
+            res.end("Erreur de mot de passe"); //Il a un problème de mot de passe
+        }
+
+    });
+});
+
 module.exports = router;

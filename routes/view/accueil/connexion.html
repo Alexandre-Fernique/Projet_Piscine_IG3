@@ -11,7 +11,7 @@
 
 </head>
 <body class="text-center">
-    <form class="form-signin">
+    <form class="form-signin" method="get" action="/connexion">
         <img class="mb-4" src="images/IG.png" alt="" width="50%" height="50%">
 
         <h1 class="h3 mb-3 font-weight-normal">
@@ -20,12 +20,12 @@
         <label for="inputEmail" class="sr-only">
             Mail
         </label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Adresse mail" required autofocus>
+        <input type="email" id="inputEmail" name="Email" class="form-control" placeholder="Adresse mail" required autofocus>
 
         <label for="inputPassword" class="sr-only">
             Mot de passe
         </label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Mot de passe" required>
+        <input type="password" id="inputPassword" name="mdp" class="form-control" placeholder="Mot de passe" required>
 
 
         <div class="checkbox mb-3">
