@@ -24,4 +24,4 @@ db.connect(function(err) {
 // Si on arrive là alors la conenxion s'est bien passée
 console.log("Connexion réussie à la base de données");
 
-module.exports = mysql;
+module.exports = db;
