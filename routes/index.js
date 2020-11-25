@@ -26,7 +26,12 @@ router.get('/inscrit', function(req, res, next) {
 
 /*
 On ne vérifie pas la mdp et la confirmation mdp (à faire)
-Faire une redirection vers une page correcte
+Faire une redirection vers une page correcte quand la création est faite
+Rediriger vers une page d'erreur si jamais il y a un problème:
+    - Numéro étudiant incorrect
+    - adresse mail pas correct (Pas mail étudiant ?)
+    - (Il faut proposer uniquement les promotions qui sont disponibles)
+    - Gérer si l'utilisateur à déjà un compte avec ce numéro étudiant
  */
 router.get("/inscription", (req, res, next) => {
     //req.query -> Récupérer dans l'url
@@ -39,20 +44,11 @@ router.get("/inscription", (req, res, next) => {
     let mdp = passwordHash.generate(cle +req.query.inputMdp); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
     let prenom = req.query.inputPrenom;
     let promo = req.query.selectPromo;
-    let sql = "INSERT INTO `etudiants` (`numero`, `nom`, `prenom`, `mail`, `motDePasse`, `anneePromo`) VALUES ('" +
-        numero +
-        "','" +
-        nom +
-        "','" +
-        prenom +
-        "','" +
-        mail +
-        "','" +
-        mdp +
-        "','" +
-        promo +
-        "');";
-    db.query(sql, (err, result) => {
+    //On fait une requête préparée (Elle permet de contrer les injections SQL)
+    //Par la fonction query les '?' vont être remplacés par les valeurs du tableau (2è argument), ici values
+    let sql = "INSERT INTO `etudiants` (`numero`, `nom`, `prenom`, `mail`, `motDePasse`, `anneePromo`) VALUES (?, ?, ?, ?, ?, ?);";
+    let values = [numero, nom, prenom, mail, mdp, promo];
+    db.query(sql, values, (err, result) => {
         if (err)
             throw err;
         console.log(result);
