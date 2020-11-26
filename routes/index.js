@@ -3,6 +3,7 @@ var router = express.Router();
 const fs = require('fs');
 var passwordHash = require('password-hash');
 var db = require(__dirname + "/../bin/bdd");
+const jwt = require('jsonwebtoken');
 
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
@@ -61,6 +62,7 @@ Gérer la redirection de l'utilisateur en fonction de ce qui a été capté :
     - Adresse mail non reconnue (On utilise plutôt le numéro étudiant parce que c'est notre clé primaire ?)
     - Mauvais mot de passe
     - Utilisateur connecté
+    - Ce système ne permet que la connexion par la base de données, c'est à dire pour les étudiants
  */
 router.get("/connexion", (req, res, next) => {
     let mail = req.query.Email;
@@ -68,15 +70,21 @@ router.get("/connexion", (req, res, next) => {
     let mdp = cle + req.query.mdp;
     //console.log(mdp);
     //let mdp = req.query.mdp;
-    let sql = "SELECT `motDePasse` FROM `etudiants` WHERE mail=?";
+    let sql = "SELECT `numero`, `motDePasse` FROM `etudiants` WHERE mail=?";
     let values = [mail];
     db.query(sql, values, (err, result) => {
         if (err)
             throw err;
         if (result[0] == null ) {
-            res.end("mail"); //Adresse mail inexistante
+            res.end("Mail inexistant"); //Adresse mail inexistante
         } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
-            res.end("Connecté"); //L'utilisateur est connecté
+            let token = jwt.sign({
+                rang_utilisateur: 0 //On lui donne le rang d'un étudiant
+            },
+            'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
+                { expiresIn: '24h' });
+            res.cookie('token', token, {httpOnly: true});
+                res.status(200).end("Connecté");
         } else {
             res.end("Erreur de mot de passe"); //Il a un problème de mot de passe
         }

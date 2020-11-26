@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
+var auth = require (__dirname + "/../bin/auth");
 
 /* GET users listing. */
 
@@ -10,12 +11,24 @@ var fs = require('fs');
 
 //localhost:3000/users/list
 
-router.get('/', function(req, res, next) { //Page d'accueil utilisateur
-    fs.readFile(__dirname +  '/view/User/Accueil_User.html', (err, template) => { //Page d'accueil -> Utilisateur connecté
-        if (err)
-            throw err;
-        res.end(template)
-    });
+router.get('/', (req, res, next) => { //Page d'accueil utilisateur
+    let rang_utilisateur = auth(req, res, next);
+    if (rang_utilisateur === 0) { // C'est un étudiant
+        fs.readFile(__dirname +  '/view/User/Accueil_User.html', (err, template) => { //Page d'accueil -> étudiant connecté
+            if (err)
+                throw err;
+            res.end(template)
+        });
+    } else if (rang_utilisateur === 1) { // C'est l'administrateur
+        fs.readFile(__dirname +  '/view/User/', (err, template) => { //Page d'accueil -> Page d'accueil administrateur connecté
+            if (err)
+                throw err;
+            res.end(template)
+        });
+    } else { //On a un problème, on le redirige vers la page de connexion
+        res.writeHead(302, {'Location': '/'});
+        res.end();
+    }
 });
 
 router.get('/list', function(req, res, next) {
