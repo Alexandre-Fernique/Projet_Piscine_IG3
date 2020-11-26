@@ -14,6 +14,7 @@ body {
     background-position: bottom;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .form-signin {

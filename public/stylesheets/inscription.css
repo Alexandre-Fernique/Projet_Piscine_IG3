@@ -14,6 +14,7 @@ body {
     background-position: bottom;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .form-signin {
@@ -53,7 +54,9 @@ body {
     max-width: 330px;
     margin: auto;
 }
-
+#numeroEt{
+    margin: 0px 5px 10px 5px;
+}
 /* Pour la page user et la mise en forme du tableau à voir pour mettre dans un autre css*/
 .divtabel{
     background-color: inherit;

@@ -3,9 +3,9 @@ const router = express.Router();
 const fs = require('fs'); // Permet la lecture de fichier
 const path = require('path'); // Permet la création de chemin absolu -> Evite de créer des problèmes de chemin entre les différentes OS
 const passwordHash = require('password-hash'); // Permet le hashage du mot de passe
-const db = require(path.resolve('bdd')); // Permet la connexion à la base de données
+const db = require(path.resolve('./bin/bdd')); // Permet la connexion à la base de données
 const jwt = require('jsonwebtoken'); // Permet l'encodage des tokens (+ sécurité)
-const auth = require(path.resolve('auth')); // Permet la gestion de l'authentification de l'utilisateur
+const auth = require(path.resolve('./bin/auth')); // Permet la gestion de l'authentification de l'utilisateur
 
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
