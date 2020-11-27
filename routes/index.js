@@ -9,19 +9,19 @@ const auth = require(path.join(__dirname, '../bin/auth')); // Permet la gestion 
 
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
-var cle = "96706546";
+var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe vérouillé
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
     let identification_status = auth(req, res, next);
-    if (identification_status === 2) { // C'est un étudiant
+    if (identification_status === 2) { // Il n'est pas connecté
         fs.readFile(__dirname +  '/view/accueil/connexion.html', (err, template) => { //Page de connexion -> Utilisateur non connecté
             if (err)
                 throw err;
             res.end(template)
         });
     } else {
-        res.writeHead(302, {'Location': '/users'});
+        res.writeHead(302, {'Location': '/users'}); //On le redirige vers la page d'accueil connecté (C'est elle qui différencie un admin et un étudiant)
         res.end();
     }
 });

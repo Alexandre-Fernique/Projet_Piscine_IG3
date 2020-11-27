@@ -18,7 +18,15 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
         fs.readFile(__dirname +  '/view/User/Accueil_User.html', (err, template) => { //Page d'accueil -> étudiant connecté
             if (err)
                 throw err;
-            res.end(template)
+            fs.readFile(__dirname + '/view/header.html', (err, header) => {
+                if (err)
+                    throw err;
+                console.log(header.toString());
+                let headerPerso = header.toString().replace('%NOM%', "Prénom"); //remplacer prénom par le prénom de la personne connecté (Requête sql ?)
+                let accueil = template.toString().replace('<header>%</header>', headerPerso);
+                //console.log(template.toString());
+                res.end(accueil);
+            });
         });
     } else if (rang_utilisateur === 1) { // C'est l'administrateur
         fs.readFile(__dirname +  '/view/Admin/index.html', (err, template) => { //Page d'accueil -> administrateur connecté
