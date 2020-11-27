@@ -7,6 +7,8 @@ const db = require(path.join(__dirname, '../bin/bdd')); // Permet la connexion �
 const jwt = require('jsonwebtoken'); // Permet l'encodage des tokens (+ sécurité)
 const auth = require(path.join(__dirname, '../bin/auth')); // Permet la gestion de l'authentification de l'utilisateur
 
+const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
+
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
 var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe vérouillé
@@ -51,19 +53,21 @@ router.get("/inscription", (req, res, next) => {
     let nom = req.query.inputNom;
     let mail = req.query.inputEmail;
     //Pour le mot de passe "qsd" (entré par l'utilisateur), on obtient le hash suivant : sha1$f83e199e$1$91fb956a0417ad5a1726e19c37b046f2f7582324
-    let mdp = passwordHash.generate(cle +req.query.inputMdp); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
+    let mdp = passwordHash.generate(cle + req.query.inputMdp); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
     let prenom = req.query.inputPrenom;
     let promo = req.query.selectPromo;
-    //On fait une requête préparée (Elle permet de contrer les injections SQL)
-    //Par la fonction query les '?' vont être remplacés par les valeurs du tableau (2è argument), ici values
-    let sql = "INSERT INTO `etudiants` (`numero`, `nom`, `prenom`, `mail`, `motDePasse`, `anneePromo`) VALUES (?, ?, ?, ?, ?, ?);";
-    let values = [numero, nom, prenom, mail, mdp, promo];
-    db.query(sql, values, (err, result) => {
-        if (err)
-            throw err;
-        console.log(result);
-    });
-    res.end("J'ai fini"); //Retourner une page d'inscription terminée
+
+    modelEtudiant.create([numero, nom, prenom, mail, mdp, promo])
+        .then((value) => {
+            res.end("terminé");
+        })
+        .catch(
+            function () {
+                console.log("Une erreur est survenue dans la fonction");
+                res.end("ssaussure");
+            }
+        );
+    //res.end("J'ai fini"); //Retourner une page d'inscription terminée
 });
 
 /*
@@ -97,6 +101,15 @@ router.get("/connexion", (req, res, next) => {
         }
 
     });
+});
+
+/*
+Fonction permettant la deconnexion et la redirection de l'utilisateur vers la page de connexion
+ */
+router.get('/deconnexion', (req, res, next) => {
+    res.clearCookie("token");
+    res.writeHead(302, {'Location': '/'});
+    res.status(200).end();
 });
 
 module.exports = router;
