@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const auth = require (path.resolve('./bin/auth'));
+const auth = require (path.join(__dirname, '../bin/auth'));
 
 /* GET users listing. */
 
@@ -21,7 +21,7 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
             res.end(template)
         });
     } else if (rang_utilisateur === 1) { // C'est l'administrateur
-        fs.readFile(__dirname +  '/view/User/', (err, template) => { //Page d'accueil -> administrateur connecté
+        fs.readFile(__dirname +  '/view/Admin/index.html', (err, template) => { //Page d'accueil -> administrateur connecté
             if (err)
                 throw err;
             res.end(template)
