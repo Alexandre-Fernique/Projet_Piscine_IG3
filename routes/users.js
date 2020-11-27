@@ -3,6 +3,9 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const auth = require (path.join(__dirname, '../bin/auth'));
+const jwt = require('jsonwebtoken');
+
+const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
 
 /* GET users listing. */
 
@@ -21,11 +24,17 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
             fs.readFile(__dirname + '/view/header.html', (err, header) => {
                 if (err)
                     throw err;
-                console.log(header.toString());
-                let headerPerso = header.toString().replace('%NOM%', "Prénom"); //remplacer prénom par le prénom de la personne connecté (Requête sql ?)
-                let accueil = template.toString().replace('<header>%</header>', headerPerso);
-                //console.log(template.toString());
-                res.end(accueil);
+                let token = req.cookies['token'];
+                const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+                modelEtudiant.get("prenom", decodedToken["numeroEt"]).then( (requete) => {
+                    let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
+                    let accueil = template.toString().replace('<header>%</header>', headerPerso);
+                    //console.log(template.toString());
+                    res.end(accueil);
+                }).catch( () => {
+                    console.log("Problème");
+                    res.end("Huston on a un problème"); // Faire une page d'erreur
+                });
             });
         });
     } else if (rang_utilisateur === 1) { // C'est l'administrateur

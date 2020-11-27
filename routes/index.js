@@ -59,7 +59,8 @@ router.get("/inscription", (req, res, next) => {
 
     modelEtudiant.create([numero, nom, prenom, mail, mdp, promo])
         .then((value) => {
-            res.end("terminé");
+            res.writeHead(302, {'Location': '/'});
+            res.end("Terminé");
         })
         .catch(
             function () {
@@ -80,7 +81,7 @@ Gérer la redirection de l'utilisateur en fonction de ce qui a été capté :
 router.get("/connexion", (req, res, next) => {
     let mail = req.query.Email;
     let mdp = cle + req.query.mdp;
-    let sql = "SELECT `motDePasse` FROM `etudiants` WHERE mail=?";
+    let sql = "SELECT `numero` ,`motDePasse` FROM `etudiants` WHERE mail=?";
     let values = [mail];
     db.query(sql, values, (err, result) => {
         if (err)
@@ -89,7 +90,8 @@ router.get("/connexion", (req, res, next) => {
             res.end("Mail inexistant"); //Adresse mail inexistante
         } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
             let token = jwt.sign({
-                rang_utilisateur: 0 //On lui donne le rang d'un étudiant
+                rang_utilisateur: 0, //On lui donne le rang d'un étudiant
+                numeroEt: result[0].numero
             },
             'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
                 { expiresIn: '24h' });
