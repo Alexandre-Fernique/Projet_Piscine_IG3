@@ -169,3 +169,6 @@ ALTER TABLE `participe`
   ADD CONSTRAINT `fk_idCreneau_creneaux` FOREIGN KEY (`idCreneaux`) REFERENCES `creneaux` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_idProf_Profeseurs` FOREIGN KEY (`idProfesseur`) REFERENCES `professeurs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
+
+-- creer les promos dans la DB
+INSERT INTO promotion VALUES ("IG3"),("IG4"),("IG5"),("MI3"),("MI4"),("MI5"),("MEA3"),("MEA4"),("MEA5"),("GBA3"),("GBA4"),("GBA5"),("STE3"),("STE4"),("STE5");

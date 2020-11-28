@@ -32,7 +32,17 @@ router.get('/inscrit', function(req, res, next) {
     fs.readFile(__dirname +  '/view/accueil/inscription.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
         if (err)
             throw err;
-        res.end(template)
+        //Gère l'affichage de l'inputPromo en fonction des promo dans la DB
+        db.query("SELECT annee FROM promotion;",(err, result)=> {
+            if (err) throw err;
+            let text = '<option selected disabled>Choisi ta promo</option>'
+            let string = JSON.parse(JSON.stringify(result))
+            for (let promo of string) {
+                text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> '
+            }
+            res.end(template.toString().replace('< option/>',text))
+
+        })
     });
 });
 
