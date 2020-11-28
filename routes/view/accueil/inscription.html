@@ -19,25 +19,25 @@
     </h1>
     <div class="form-row" >
         <label for="numeroEt" class="sr-only">Numéro étudiant</label>
-        <input type="number" id="numeroEt" name = "numeroEt" class="form-control" placeholder="Numéro étudiant" required>
+        <input type="number" id="numeroEt" name = "numeroEt" class="form-control" placeholder="Numéro étudiant" tabindex="1" required autofocus>
         <div class="col">
             <label for="inputNom" class="sr-only">Nom</label>
-            <input type="text" id="inputNom" name = "inputNom" class="form-control" placeholder="Nom" required>
+            <input type="text" id="inputNom" name = "inputNom" class="form-control" placeholder="Nom" tabindex="2" required>
 
             <label for="inputEmail" class="sr-only">Mail</label>
-            <input type="email" id="inputEmail" name = "inputEmail" class="form-control" placeholder="Adresse mail" required autofocus>
+            <input type="email" id="inputEmail" name = "inputEmail" class="form-control" placeholder="Adresse mail" tabindex="4" required>
 
             <label for="inputMdp" class="sr-only">Mot de passe</label>
-            <input type="password" id="inputMdp" name = "inputMdp" class="form-control" placeholder="Mot de passe" required>
+            <input type="password" id="inputMdp" name = "inputMdp" class="form-control" placeholder="Mot de passe" tabindex="6" required>
 
 
         </div>
         <div class="col" >
             <label for="inputPrenom" class="sr-only">Prénom</label>
-            <input type="text"  id="inputPrenom" name="inputPrenom" class="form-control" placeholder="Prénom" required>
+            <input type="text"  id="inputPrenom" name="inputPrenom" class="form-control" placeholder="Prénom" tabindex="3" required>
 
             <label for="selectPromo" class="sr-only">Promo</label>
-            <select class="custom-select" id="selectPromo" name="selectPromo">
+            <select class="custom-select" id="selectPromo" name="selectPromo" tabindex="5">
                 <option selected disabled>Choisi ta promo</option>
                 <option value="IG3">IG3</option>
                 <option value="IG4">IG4</option>
@@ -45,7 +45,7 @@
             </select>
 
             <label for="inputConfMdp" class="sr-only">Confirmer Mot de passe </label>
-            <input type="password" id="inputConfMdp" class="form-control" placeholder="Confirmer Mot de passe" required>
+            <input type="password" id="inputConfMdp" class="form-control" placeholder="Confirmer Mot de passe" tabindex="7" required>
 
         </div>
     </div>

@@ -27,7 +27,9 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
                 let token = req.cookies['token'];
                 const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
                 modelEtudiant.get("prenom", decodedToken["numeroEt"]).then( (requete) => {
+                    //On ajoute Bonjour, <Prénom> dans l'entête
                     let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
+                    //On ajoute l'entête dans notre page
                     let accueil = template.toString().replace('<header>%</header>', headerPerso);
                     //console.log(template.toString());
                     res.end(accueil);
