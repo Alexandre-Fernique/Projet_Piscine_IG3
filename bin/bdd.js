@@ -12,7 +12,8 @@ var db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "projet_piscine"
+    database: "projet_piscine",
+    timezone: 'utc'
 });
 
 db.connect(function(err) {

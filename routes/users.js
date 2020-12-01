@@ -26,13 +26,33 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
                     throw err;
                 let token = req.cookies['token'];
                 const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-                modelEtudiant.get("prenom", decodedToken["numeroEt"]).then( (requete) => {
+                modelEtudiant.get("prenom,anneePromo", decodedToken["numeroEt"]).then( (requete) => {
                     //On ajoute Bonjour, <Prénom> dans l'entête
                     let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
                     //On ajoute l'entête dans notre page
                     let accueil = template.toString().replace('<header>%</header>', headerPerso);
                     //console.log(template.toString());
-                    res.end(accueil);
+                    //requete SQL des créneaux en fonction de la promo
+                    modelEtudiant.getEvent(requete[0].anneePromo).then((listEvent)=>{
+                        const tampon =JSON.parse(JSON.stringify(listEvent))
+                        let resultat='<script>let liste=[';
+                        for(let event of tampon)
+                        {
+                            let data={
+                                id: event.id,
+                                title: event.salle,
+                                start: event.date.split("T")[0] +"T"+event.heureDebut,
+                            }
+                            resultat+= JSON.stringify(data)+","
+                        }
+                        resultat=resultat.substring(0,resultat.length-1)+'];let duree ="'+tampon[0].dureeCreneau.substring(0,5)+'";</script>'
+                        res.end(accueil.replace('<lesevents></lesevents>',resultat))
+                        //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+
+                    }).catch(()=>{
+                        console.log("Problème event");
+                    })
+
                 }).catch( () => {
                     console.log("Problème");
                     res.end("Huston on a un problème"); // Faire une page d'erreur
@@ -54,5 +74,9 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
 router.get('/list', function(req, res, next) {
     res.status(200).sendFile(__dirname +  '/view/users.html');
 });
+/*
+router.get('/reservation', function(req, res, next) {
+    res.status(200).sendFile(__dirname +  '/view/users.html');
+});*/
 
 module.exports = router;

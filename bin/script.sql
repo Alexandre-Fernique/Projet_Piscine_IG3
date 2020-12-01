@@ -1,5 +1,10 @@
 -- --------------------------------------------------------
 
+--creer et utiliser la base de donnée projet_piscine (en tout cas pour moi)
+
+DROP DATABASE `projet_picsine`;
+CREATE DATABASE `projet_picsine`;
+USE `projet_picsine`;
 --
 -- Structure de la table `composer`
 --
@@ -55,8 +60,8 @@ CREATE TABLE IF NOT EXISTS `etudiants` (
 -- Structure de la table ` evenements`
 --
 
-DROP TABLE IF EXISTS ` evenements`;
-CREATE TABLE IF NOT EXISTS ` evenements` (
+DROP TABLE IF EXISTS `evenements`;
+CREATE TABLE IF NOT EXISTS `evenements` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(32) NOT NULL,
   `dateDebut` date NOT NULL,
@@ -141,7 +146,7 @@ ALTER TABLE `composer`
 -- Contraintes pour la table `creneaux`
 --
 ALTER TABLE `creneaux`
-  ADD CONSTRAINT `fk_idEvenement_evenements` FOREIGN KEY (`idEvenement`) REFERENCES ` evenements` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_idEvenement_evenements` FOREIGN KEY (`idEvenement`) REFERENCES `evenements` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_idGroupeProjet_groupeprojet` FOREIGN KEY (`idGroupeProjet`) REFERENCES `groupeprojet` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
@@ -151,9 +156,9 @@ ALTER TABLE `etudiants`
   ADD CONSTRAINT `fk_anneePromo_promotion_etudiant` FOREIGN KEY (`anneePromo`) REFERENCES `promotion` (`annee`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Contraintes pour la table ` evenements`
+-- Contraintes pour la table `evenements`
 --
-ALTER TABLE ` evenements`
+ALTER TABLE `evenements`
   ADD CONSTRAINT `fk_anneePromo_promotion` FOREIGN KEY (`anneePromo`) REFERENCES `promotion` (`annee`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -172,3 +177,9 @@ COMMIT;
 
 -- creer les promos dans la DB
 INSERT INTO promotion VALUES ("IG3"),("IG4"),("IG5"),("MI3"),("MI4"),("MI5"),("MEA3"),("MEA4"),("MEA5"),("GBA3"),("GBA4"),("GBA5"),("STE3"),("STE4"),("STE5");
+--création d'un evènment
+INSERT INTO `evenements` VALUES (1,"test","2020-11-30",15,"2020-11-30","01:00:00",3,"IG3");
+--création de quelque créneaux
+INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-1","14:00:00","TD005",1);
+INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-2","15:00:00","TD005",1);
+INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-3","16:00:00","TD005",1);
