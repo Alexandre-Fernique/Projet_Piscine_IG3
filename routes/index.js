@@ -40,7 +40,7 @@ router.get('/inscrit', function(req, res, next) {
             for (let promo of string) {
                 text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> '
             }
-            res.end(template.toString().replace('< option/>',text))
+            res.end(template.toString().replace('< option/>',text));
 
         })
     });

@@ -52,11 +52,11 @@ CREATE TABLE IF NOT EXISTS `etudiants` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table ` evenements`
+-- Structure de la table `evenements`
 --
 
-DROP TABLE IF EXISTS ` evenements`;
-CREATE TABLE IF NOT EXISTS ` evenements` (
+DROP TABLE IF EXISTS `evenements`;
+CREATE TABLE IF NOT EXISTS `evenements` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(32) NOT NULL,
   `dateDebut` date NOT NULL,
@@ -141,7 +141,7 @@ ALTER TABLE `composer`
 -- Contraintes pour la table `creneaux`
 --
 ALTER TABLE `creneaux`
-  ADD CONSTRAINT `fk_idEvenement_evenements` FOREIGN KEY (`idEvenement`) REFERENCES ` evenements` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_idEvenement_evenements` FOREIGN KEY (`idEvenement`) REFERENCES `evenements` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_idGroupeProjet_groupeprojet` FOREIGN KEY (`idGroupeProjet`) REFERENCES `groupeprojet` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
@@ -151,9 +151,9 @@ ALTER TABLE `etudiants`
   ADD CONSTRAINT `fk_anneePromo_promotion_etudiant` FOREIGN KEY (`anneePromo`) REFERENCES `promotion` (`annee`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Contraintes pour la table ` evenements`
+-- Contraintes pour la table `evenements`
 --
-ALTER TABLE ` evenements`
+ALTER TABLE `evenements`
   ADD CONSTRAINT `fk_anneePromo_promotion` FOREIGN KEY (`anneePromo`) REFERENCES `promotion` (`annee`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --

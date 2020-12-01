@@ -4,6 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const auth = require (path.join(__dirname, '../bin/auth'));
 const jwt = require('jsonwebtoken');
+//Lorsqu'on veut afficher quelque chose rentré par l'utilsateur on empêche la page d'intépreter l'html
+//Si son nom est "<h1>Chiant" on ne veut pas que cela détruise notre affiche en interprétant la balise h1 mais bien qu'il affiche cela comme le nom
+const htmlspecialchars = require('htmlspecialchars');
 
 const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
 
@@ -28,7 +31,7 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
                 const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
                 modelEtudiant.get("prenom", decodedToken["numeroEt"]).then( (requete) => {
                     //On ajoute Bonjour, <Prénom> dans l'entête
-                    let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
+                    let headerPerso = header.toString().replace('%NOM%', htmlspecialchars(requete[0].prenom));
                     //On ajoute l'entête dans notre page
                     let accueil = template.toString().replace('<header>%</header>', headerPerso);
                     //console.log(template.toString());
