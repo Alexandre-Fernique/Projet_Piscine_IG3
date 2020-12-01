@@ -30,7 +30,7 @@ num est le numéro étudiant (La clé primaire de la table)
  */
 function get (column, num) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT `" + column + "` FROM `etudiants` WHERE numero=" + num + ";";
+        let sql = "SELECT " + column + " FROM `etudiants` WHERE numero=" + num + ";";
         db.query(sql, (err, result) => {
             if (err) {
                 console.log(err);
@@ -43,4 +43,23 @@ function get (column, num) {
         });
     });
 }
-module.exports = {create, get};
+/*
+Cette fonction est un getteur des créneaux(et leurs informations) en fonction de ta promo
+*/
+function getEvent(anne){
+    return new Promise((resolve ,reject)=>{
+        let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle` FROM `evenements`,`creneaux` WHERE evenements.id=idEvenement and anneePromo='"+anne+"';"
+
+        db.query(sql,(err,result)=>{
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
+            else {
+                console.log(result);
+                resolve(result);
+            }
+        });
+    });
+}
+module.exports = {create, get,getEvent};

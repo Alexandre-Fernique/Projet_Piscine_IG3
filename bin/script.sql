@@ -1,5 +1,10 @@
 -- --------------------------------------------------------
 
+--creer et utiliser la base de donnée projet_piscine (en tout cas pour moi)
+
+DROP DATABASE `projet_picsine`;
+CREATE DATABASE `projet_picsine`;
+USE `projet_picsine`;
 --
 -- Structure de la table `composer`
 --
@@ -172,3 +177,9 @@ COMMIT;
 
 -- creer les promos dans la DB
 INSERT INTO promotion VALUES ("IG3"),("IG4"),("IG5"),("MI3"),("MI4"),("MI5"),("MEA3"),("MEA4"),("MEA5"),("GBA3"),("GBA4"),("GBA5"),("STE3"),("STE4"),("STE5");
+--création d'un evènment
+INSERT INTO `evenements` VALUES (1,"test","2020-11-30",15,"2020-11-30","01:00:00",3,"IG3");
+--création de quelque créneaux
+INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-1","14:00:00","TD005",1);
+INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-2","15:00:00","TD005",1);
+INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-3","16:00:00","TD005",1);
