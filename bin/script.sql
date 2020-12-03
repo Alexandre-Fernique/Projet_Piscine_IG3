@@ -183,3 +183,5 @@ INSERT INTO `evenements` VALUES (1,"test","2020-11-30",15,"2020-11-30","01:00:00
 INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-1","14:00:00","TD005",1);
 INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-2","15:00:00","TD005",1);
 INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-3","16:00:00","TD005",1);
+INSERT INTO professeurs(id,nom,prenom) values (1,"Alexa","leprof");
+INSERT INTO participe(idProfesseur,idCreneaux) values(1,1);

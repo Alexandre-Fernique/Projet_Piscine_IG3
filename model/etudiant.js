@@ -43,23 +43,78 @@ function get (column, num) {
         });
     });
 }
-/*
-Cette fonction est un getteur des créneaux(et leurs informations) en fonction de ta promo
-*/
-function getEvent(anne){
-    return new Promise((resolve ,reject)=>{
-        let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle` FROM `evenements`,`creneaux` WHERE evenements.id=idEvenement and anneePromo='"+anne+"';"
-
-        db.query(sql,(err,result)=>{
+// fonction qui permet de réserver un créneau disponible pour un groupe donné en paramètre(idGroupe) à un créneau donner(id)
+function changeCreneaux(id,idGroupe){
+    return new Promise((resolve, reject) => {
+        let sql = "UPDATE `creneaux` SET idGroupeProjet=NULL WHERE idGroupeProjet="+idGroupe+";"
+        let sql2 = "UPDATE `creneaux` SET idGroupeProjet="+idGroupe+" WHERE id="+id+" and idGroupeProjet IS NULL ;"
+        db.query(sql, (err) => {
             if (err) {
                 console.log(err);
                 reject(err);
             }
             else {
+                console.log("Changement fait");
+                db.query(sql2, (err2) => {
+                    if (err2) {
+                        console.log(err);
+                        reject(err);
+                   }
+                    console.log("Changement fait");
+                });
+            }
+        });
+    });
+}
+//fonction qui retourne les groupes associés au numéro de l'étudiant
+function getGrpId (num) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT `idGroupe` FROM `composer` WHERE numeroEtudiant=" + num + ";";
+        db.query(sql, (err, result) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else {
                 console.log(result);
                 resolve(result);
             }
         });
     });
 }
-module.exports = {create, get,getEvent};
+/*
+Cette fonction est un getteur des créneaux(et leurs informations) en fonction de ta promo
+*/
+function getEvent(anne,prof=false){
+    return new Promise((resolve ,reject)=>{
+        //requete pour avoir tout les creneaux
+        //"SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle` FROM `evenements`,`creneaux` WHERE evenements.id=idEvenement and anneePromo='" + anne + "';"
+        if(prof) {
+            let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`, professeurs.nom,`prenom`,`idGroupeProjet` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
+            db.query(sql, (err, result) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                } else {
+                    console.log(result);
+                    resolve(result);
+                }
+            });
+        }
+        else{
+            let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`,`idGroupeProjet` FROM `evenements`,`creneaux`,`participe` WHERE evenements.id=idEvenement and creneaux.id!=idCreneaux and anneePromo='" + anne + "' GROUP BY creneaux.id;"
+            //requete pour avoir les prof en plus
+            // SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`, professeurs.nom,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='IG3';
+            db.query(sql, (err, result) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                } else {
+                    console.log(result);
+                    resolve(result);
+                }
+            });
+        }
+
+    });
+}
+module.exports = {create, get,getEvent,getGrpId,changeCreneaux };
