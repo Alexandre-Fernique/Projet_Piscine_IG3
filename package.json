@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "debug": "latest",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "htmlspecialchars": "^1.0.5",
     "http-errors": "latest",

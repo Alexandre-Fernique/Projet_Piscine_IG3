@@ -28,6 +28,9 @@ function miseAJourPage (template, donnee) {
     return template;
 }
 router.get('/list', (req, res, next) => { //Afficher le détail de l'évenement
+    if (auth(req, res, next) !== 1) {
+        res.end("T'as rien à faire là ");
+    }
     fs.readFile(path.join(__dirname, "view/Admin/evenement/detail.html"), (err, template) => {
         if (err)
             throw err;
@@ -46,6 +49,9 @@ router.get('/list', (req, res, next) => { //Afficher le détail de l'évenement
 });
 
 router.get('/update', (req, res, next) => { //Afficher le détail de l'évenement
+    if (auth(req, res, next) !== 1) {
+        res.end("Tu n'as rien à faire là");
+    }
     fs.readFile(path.join(__dirname, "view/Admin/evenement/detail.html"), (err, template) => {
         if (err)
             throw err;
@@ -65,6 +71,9 @@ router.get('/update', (req, res, next) => { //Afficher le détail de l'évenemen
 });
 
 router.get('/updated', (req, res, next) => {
+    if (auth(req, res, next) !== 1) {
+        res.end("Tu n'as rien à faire là");
+    }
     let id = req.query.id;
     let nomEvent = req.query.nomEvent;
     let dateDebut = req.query.dateDebut;

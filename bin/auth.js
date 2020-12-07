@@ -16,21 +16,3 @@ module.exports = (req, res, next) => {
         return decodedToken.rang_utilisateur; // Retourne 1 ou 2 qui est le rang de l'utilisateur
     }
 };
-/*
-    try {
-        const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-        const numEt = decodedToken.numEt;
-        if (req.body.numEt && req.body.numEt !== numEt) {
-            res.status(402).json({
-                error: new Error('numéro invalide')
-            });
-        } else {
-            next();
-        }
-    } catch {
-        res.status(401).json({
-            error: new Error('Invalid request!')
-        });
-    }
- */

@@ -89,8 +89,25 @@ Gérer la redirection de l'utilisateur en fonction de ce qui a été capté :
     - Ce système ne permet que la connexion par la base de données, c'est à dire pour les étudiants
  */
 router.get("/connexion", (req, res, next) => {
+    //Faudra trouver un moyen plus secure de faire ça hein
+    let mdpAdmin = passwordHash.generate(cle + "secure");
+    let mailAdmin = "mail@admin.fr";
+
     let mail = req.query.Email;
     let mdp = cle + req.query.mdp;
+
+    if (mailAdmin === mail && passwordHash.verify(mdp, mdpAdmin)) {
+        let token = jwt.sign({
+                rang_utilisateur: 1, //On lui donne le rang d'un admin
+                numeroEt: -1 //On lui donne comme numéro étudiant -1 pour éviter que cela génère une erreur lors de l'appel
+            },
+            'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
+            { expiresIn: '24h' });
+        res.cookie('token', token, {httpOnly: true});
+        res.writeHead(302, {'Location': '/'}); //On le retourne vers la page d'accueil admin
+        res.status(200).end("");
+    }
+
     let sql = "SELECT `numero` ,`motDePasse` FROM `etudiants` WHERE mail=?";
     let values = [mail];
     db.query(sql, values, (err, result) => {
