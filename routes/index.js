@@ -22,9 +22,14 @@ router.get('/', function(req, res, next) {
                 throw err;
             res.end(template)
         });
-    } else {
+    } else if (identification_status === 0) { //C'est une étudiant
         res.writeHead(302, {'Location': '/users'}); //On le redirige vers la page d'accueil connecté (C'est elle qui différencie un admin et un étudiant)
         res.end();
+    } else if (identification_status === 1) {
+        res.writeHead(302, {'Location': '/admin'}); //On le redirige vers la page d'accueil connecté (C'est elle qui différencie un admin et un étudiant)
+        res.end();
+    } else {
+        res.end("Une erreur est suvernue, vous n'avez pas de status d'identification valide"); //Faire une page d'erreur
     }
 });
 

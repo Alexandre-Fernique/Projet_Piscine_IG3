@@ -10,7 +10,7 @@
 <body class="container">
 <header>%</header>
 <div>
-    <form action="#" method="get">
+    <form action="/admin/evenement/updated" method="get">
         <div class="center">
             <h1 class="h2 mb-3 font-weight-normal">%nomEvent%</h1>
         </div>
@@ -21,13 +21,13 @@
                 <label for="dateDebut">
                     Date de début (JJ/MM/AAAA)
                 </label>
-                <input id="dateDebut" class="form-control" type="date" name="dateDebut" value = "%dateDebut%" readonly>
+                <input id="dateDebut" class="form-control" type="date" name="dateDebut" value = "%dateDebut%">
             </div>
             <div class="form-group col-md-6">
                 <label for="Duree">
                     Durée en jours
                 </label>
-                <input id="Duree" type="number" class="form-control" name="Duree" value='%Duree%' readonly>
+                <input id="Duree" type="number" class="form-control" name="Duree" value='%Duree%'>
             </div>
         </div>
         <div class="form-row">
@@ -35,13 +35,13 @@
                 <label for="dateLimiteResa">
                     Date de fin des réservations (JJ/MM/AAAA)
                 </label>
-                <input id="dateLimiteResa" type="date" class="form-control" name="dateLimiteResa" value = '%dateLimiteResa%' readonly>
+                <input id="dateLimiteResa" type="date" class="form-control" name="dateLimiteResa" value = '%dateLimiteResa%'>
             </div>
             <div class="form-group col-md-6">
                 <label for="dureeCreneau">
                     Durée d'un créneau (HH:MM:SS)
                 </label>
-                <input id="dureeCreneau" type="text" class="form-control" name="dureeCreneau" value = '%dureeCreneau%' readonly>
+                <input id="dureeCreneau" type="text" class="form-control" name="dureeCreneau" value = '%dureeCreneau%'>
             </div>
         </div>
         <div class="form-row">
@@ -49,15 +49,21 @@
                 <label for="nombreMembresJury">
                     Nombre de membres du jury
                 </label>
-                <input id="nombreMembresJury" type="number" class="form-control" name="nombreMembresJury" value = '%nombreMembresJury%' readonly>
+                <input id="nombreMembresJury" type="number" class="form-control" name="nombreMembresJury" value = '%nombreMembresJury%'>
             </div>
             <div class="form-group col-md-6">
                 <!-- Mettre un menu déroulant à la place du texte-->
                 <label for="anneePromo">
                     Promotion concernée
                 </label>
-                <input id="anneePromo" type="numer" class="form-control" name="anneePromo" value = '%anneePromo%' readonly>
+                <!--<input id="anneePromo" type="text" class="form-control" name="anneePromo" value = '%anneePromo%'>-->
+                <select name="anneePromo" id="anneePromo" class="form-control">
+                    %option%
+                </select>
             </div>
+        </div>
+        <div class = "center">
+            <button type="submit" class="btn btn-primary">Modifier</button>
         </div>
     </form>
 </div>

@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 
---creer et utiliser la base de donnée projet_piscine (en tout cas pour moi)
+-- creer et utiliser la base de donnée projet_piscine (en tout cas pour moi)
 
 DROP DATABASE `projet_picsine`;
 CREATE DATABASE `projet_picsine`;

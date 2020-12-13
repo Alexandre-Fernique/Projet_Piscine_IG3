@@ -52,17 +52,30 @@ router.get('/update', (req, res, next) => { //Afficher le détail de l'évenemen
     if (auth(req, res, next) !== 1) {
         res.end("Tu n'as rien à faire là");
     }
-    fs.readFile(path.join(__dirname, "view/Admin/evenement/detail.html"), (err, template) => {
+    fs.readFile(path.join(__dirname, "view/Admin/evenement/update.html"), (err, template) => {
         if (err)
             throw err;
 
         modelEvenement.getAll()
             .then((data) => {
-                template = miseAJourPage(template, data[0]);
-                template = template.toString().replace(new RegExp('readonly', 'gi'), ''); //On enlève tous les readonly
-                template = template.toString().replace('class = "center" hidden', 'class = "center"');
-                template = template.toString().replace('action="#"', 'action="/admin/evenement/updated"');
-                res.end(template);
+                modelEvenement.getAllPromotion()
+                    .then((listePromotion) => {
+                        let txt = ""; let promo;
+                        for (let i = 0; i < listePromotion.length; i ++) {
+                            promo = listePromotion[i].annee;
+                            if (promo === data[0].anneePromo) {
+                                txt += "<option value = \"" + promo + "\" selected>" + promo +"</option>";
+                            } else {
+                                txt += "<option value = \"" + promo + "\">" + promo +"</option>"
+                            }
+                            txt += "\n";
+                        }
+                        template = template.toString().replace("%option%", txt);
+                        //console.log(template)
+                        console.log(template.toString())
+                        template = miseAJourPage(template, data[0]);
+                        res.end(template);
+                    })
             })
             .catch((err) => {
                 throw err; //Pour le moment on stoppe tout et on génère une erreur
@@ -71,7 +84,7 @@ router.get('/update', (req, res, next) => { //Afficher le détail de l'évenemen
 });
 
 router.get('/updated', (req, res, next) => {
-    if (auth(req, res, next) !== 1) {
+    if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
     }
     let id = req.query.id;
@@ -82,10 +95,11 @@ router.get('/updated', (req, res, next) => {
     let dureeCreneau = req.query.dureeCreneau;
     let nombreMembresJury = req.query.nombreMembresJury;
     let anneePromo = req.query.anneePromo;
-    modelEvenement.create([nomEvent, "2020-11-17", Duree, "2020-11-15", dureeCreneau, nombreMembresJury, anneePromo, id])
+    modelEvenement.update([nomEvent, dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo, id])
         .then((retour) => {
             console.log(retour);
-            res.end("C'est bon");
+            res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
+            res.end();
         })
         .catch(
             function () {

@@ -7,7 +7,8 @@ require('dotenv').config({path: __dirname + '/process.env'});
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var adminRouter = require("./routes/admin_event");
+var adminEventRouter = require("./routes/admin_event");
+var adminRouter = require("./routes/admin");
 
 var app = express();
 
@@ -26,7 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // www.exemple.fr/user
 app.use('/', indexRouter); //localhost:3000/
 app.use('/users', usersRouter); //localhost:3000/users
-app.use('/admin/evenement', adminRouter); //localhost:3000/admin
+app.use('/admin/evenement', adminEventRouter); //localhost:3000/admin/evenement
+app.use('/admin', adminRouter); //localhost:3000/admin
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,7 +1,7 @@
 const path = require('path');
 const db = require(path.join(__dirname, '../bin/bdd'));
 
-function create (values) {
+function update (values) {
     return new Promise((resolve, reject) => {
         //On fait une requête préparée (Elle permet de contrer les injections SQL)
         //Par la fonction query les '?' vont être remplacés par les valeurs du tableau (2è argument), ici values
@@ -37,4 +37,18 @@ function getAll () {
     });
 }
 
-module.exports = {create, get, getAll};
+function getAllPromotion () {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM `promotion` WHERE 1;";
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    });
+}
+
+module.exports = {update, get, getAll, getAllPromotion};
