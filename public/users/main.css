@@ -1071,7 +1071,7 @@ A VERTICAL event
     z-index: 1;
   }
 .fc .fc-timegrid-slot { /* a <td> */
-    height: 1.5em;
+    height: 2.5em;
     border-bottom: 0 /* each cell owns its top border */
   }
 .fc .fc-timegrid-slot:empty:before {
