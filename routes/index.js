@@ -40,10 +40,10 @@ router.get('/inscrit', function(req, res, next) {
         //Gère l'affichage de l'inputPromo en fonction des promo dans la DB
         db.query("SELECT annee FROM promotion;",(err, result)=> {
             if (err) throw err;
-            let text = '<option selected disabled>Choisi ta promo</option>'
-            let string = JSON.parse(JSON.stringify(result))
+            let text = '<option selected disabled>Choisi ta promo</option>';
+            let string = JSON.parse(JSON.stringify(result));
             for (let promo of string) {
-                text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> '
+                text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
             }
             res.end(template.toString().replace('< option/>',text));
 
@@ -100,6 +100,7 @@ router.get("/connexion", (req, res, next) => {
 
     let mail = req.query.Email;
     let mdp = cle + req.query.mdp;
+    let cookieTime = req.query.remember;
 
     if (mailAdmin === mail && passwordHash.verify(mdp, mdpAdmin)) {
         let token = jwt.sign({
@@ -108,7 +109,11 @@ router.get("/connexion", (req, res, next) => {
             },
             'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
             { expiresIn: '24h' });
-        res.cookie('token', token, {httpOnly: true});
+        if (cookieTime === "ok") {
+            res.cookie('token', token, {expires: new Date(Date.now() + (3600000 * 24 * 30)), httpOnly: true}); //3600000  = 1 heure
+        } else {
+            res.cookie('token', token, {expires: 0, httpOnly: true});
+        }
         res.writeHead(302, {'Location': '/'}); //On le retourne vers la page d'accueil admin
         res.status(200).end("");
     }
@@ -119,6 +124,7 @@ router.get("/connexion", (req, res, next) => {
         if (err)
             throw err;
         if (result[0] == null ) {
+            res.writeHead(302, {'Location': '/?er=mail'});
             res.end("Mail inexistant"); //Adresse mail inexistante
         } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
             let token = jwt.sign({
@@ -127,7 +133,12 @@ router.get("/connexion", (req, res, next) => {
             },
             'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
                 { expiresIn: '24h' });
-            res.cookie('token', token, {httpOnly: true});
+            if (cookieTime === "ok") {
+                res.cookie('token', token, {expires: new Date(Date.now() + (3600000 * 24 * 30)), httpOnly: true}); //3600000  = 1 heure
+            } else {
+                res.cookie('token', token, {expires: 0, httpOnly: true});
+            }
+            console.log("HEHOOOOOOOOOOOOOOOOOO");
                 res.writeHead(302, {'Location': '/'});
                 res.status(200).end("Connecté");
         } else {

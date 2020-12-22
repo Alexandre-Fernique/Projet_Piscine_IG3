@@ -72,7 +72,7 @@ router.get('/update', (req, res, next) => { //Afficher le détail de l'évenemen
                         }
                         template = template.toString().replace("%option%", txt);
                         //console.log(template)
-                        console.log(template.toString())
+                        console.log(template.toString());
                         template = miseAJourPage(template, data[0]);
                         res.end(template);
                     })
