@@ -138,7 +138,6 @@ router.get("/connexion", (req, res, next) => {
             } else {
                 res.cookie('token', token, {expires: 0, httpOnly: true});
             }
-            console.log("HEHOOOOOOOOOOOOOOOOOO");
                 res.writeHead(302, {'Location': '/'});
                 res.status(200).end("Connecté");
         } else {

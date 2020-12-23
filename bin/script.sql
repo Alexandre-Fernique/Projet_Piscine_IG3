@@ -2,9 +2,9 @@
 
 -- creer et utiliser la base de donnée projet_piscine (en tout cas pour moi)
 
-DROP DATABASE `projet_picsine`;
-CREATE DATABASE `projet_picsine`;
-USE `projet_picsine`;
+DROP DATABASE `projet_piscine`;
+CREATE DATABASE `projet_piscine`;
+USE `projet_piscine`;
 --
 -- Structure de la table `composer`
 --
