@@ -115,36 +115,36 @@ router.get("/connexion", (req, res, next) => {
             res.cookie('token', token, {expires: 0, httpOnly: true});
         }
         res.writeHead(302, {'Location': '/'}); //On le retourne vers la page d'accueil admin
-        res.status(200).end("");
-    }
-
-    let sql = "SELECT `numero` ,`motDePasse` FROM `etudiants` WHERE mail=?";
-    let values = [mail];
-    db.query(sql, values, (err, result) => {
-        if (err)
-            throw err;
-        if (result[0] == null ) {
-            res.writeHead(302, {'Location': '/?er=mail'});
-            res.end("Mail inexistant"); //Adresse mail inexistante
-        } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
-            let token = jwt.sign({
-                rang_utilisateur: 0, //On lui donne le rang d'un étudiant
-                numeroEt: result[0].numero
-            },
-            'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
-                { expiresIn: '24h' });
-            if (cookieTime === "ok") {
-                res.cookie('token', token, {expires: new Date(Date.now() + (3600000 * 24 * 30)), httpOnly: true}); //3600000  = 1 heure
-            } else {
-                res.cookie('token', token, {expires: 0, httpOnly: true});
-            }
+        res.status(200).end();
+    } else {
+        let sql = "SELECT `numero` ,`motDePasse` FROM `etudiants` WHERE mail=?";
+        let values = [mail];
+        db.query(sql, values, (err, result) => {
+            if (err)
+                throw err;
+            if (result[0] == null ) {
+                res.writeHead(302, {'Location': '/?er=mail'});
+                res.end("Mail inexistant"); //Adresse mail inexistante
+            } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
+                let token = jwt.sign({
+                        rang_utilisateur: 0, //On lui donne le rang d'un étudiant
+                        numeroEt: result[0].numero
+                    },
+                    'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
+                    { expiresIn: '24h' });
+                if (cookieTime === "ok") {
+                    res.cookie('token', token, {expires: new Date(Date.now() + (3600000 * 24 * 30)), httpOnly: true}); //3600000  = 1 heure
+                } else {
+                    res.cookie('token', token, {expires: 0, httpOnly: true});
+                }
                 res.writeHead(302, {'Location': '/'});
                 res.status(200).end("Connecté");
-        } else {
-            res.end("Erreur de mot de passe"); //Il a un problème de mot de passe
-        }
+            } else {
+                res.end("Erreur de mot de passe"); //Il a un problème de mot de passe
+            }
 
-    });
+        });
+    }
 });
 
 /*

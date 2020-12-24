@@ -51,4 +51,16 @@ function getAllPromotion () {
     });
 }
 
-module.exports = {update, get, getAll, getAllPromotion};
+function truncate () {
+    return new Promise(((resolve, reject) => {
+        let sql = "DELETE FROM `evenements`;";
+        db.query(sql, (err, result) => {
+            if (err)
+                reject(err);
+            else
+                resolve(result);
+        });
+    }));
+}
+
+module.exports = {update, get, getAll, getAllPromotion, truncate};

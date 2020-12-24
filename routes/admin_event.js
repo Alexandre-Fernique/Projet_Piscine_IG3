@@ -8,6 +8,7 @@ const htmlspecialchars = require('htmlspecialchars');
 
 const modelEvenement = require(path.join(__dirname, '../model/evenement'));
 
+
 function miseAJourPage (template, donnee) {
     let dateDebut = new Date(String(donnee.dateDebut));
     let mois = dateDebut.getMonth()+1;
@@ -34,17 +35,26 @@ router.get('/list', (req, res, next) => { //Afficher le détail de l'évenement
     fs.readFile(path.join(__dirname, "view/Admin/evenement/detail.html"), (err, template) => {
         if (err)
             throw err;
-
-        modelEvenement.getAll()
-            .then((data) => {
-                console.log(data[0].dateDebut);
-                template = miseAJourPage(template, data[0]);
-                //template = template.toString().replace('disabled', ''); Pour la modification de l'événement, si on utilise la même page hmtl
-                res.end(template);
-            })
-            .catch((err) => {
-                throw err; //Pour le moment on stoppe tout et on génère une erreur
-            })
+        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+            let accueil = template.toString().replace('<header>%</header>', header.toString());
+            modelEvenement.getAll()
+                .then((data) => {
+                    console.log("data : " + data.length > 0);
+                    if (data.length > 0) {
+                        accueil = miseAJourPage(accueil, data[0]);
+                        //template = template.toString().replace('disabled', ''); Pour la modification de l'événement, si on utilise la même page hmtl
+                        res.end(accueil);
+                    }
+                    else {
+                        fs.readFile(path.join(__dirname, "view/Admin/evenement/pasEvenement.html"), (err, content) => {
+                            res.end(content);
+                        });
+                    }
+                })
+                .catch((err) => {
+                    throw err; //Pour le moment on stoppe tout et on génère une erreur
+                })
+        });
     });
 });
 
@@ -55,31 +65,33 @@ router.get('/update', (req, res, next) => { //Afficher le détail de l'évenemen
     fs.readFile(path.join(__dirname, "view/Admin/evenement/update.html"), (err, template) => {
         if (err)
             throw err;
-
-        modelEvenement.getAll()
-            .then((data) => {
-                modelEvenement.getAllPromotion()
-                    .then((listePromotion) => {
-                        let txt = ""; let promo;
-                        for (let i = 0; i < listePromotion.length; i ++) {
-                            promo = listePromotion[i].annee;
-                            if (promo === data[0].anneePromo) {
-                                txt += "<option value = \"" + promo + "\" selected>" + promo +"</option>";
-                            } else {
-                                txt += "<option value = \"" + promo + "\">" + promo +"</option>"
+        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+            if (err)
+                throw err;
+            let accueil = template.toString().replace('<header>%</header>', header.toString());
+            modelEvenement.getAll()
+                .then((data) => {
+                    modelEvenement.getAllPromotion()
+                        .then((listePromotion) => {
+                            let txt = ""; let promo;
+                            for (let i = 0; i < listePromotion.length; i ++) {
+                                promo = listePromotion[i].annee;
+                                if (promo === data[0].anneePromo) {
+                                    txt += "<option value = \"" + promo + "\" selected>" + promo +"</option>";
+                                } else {
+                                    txt += "<option value = \"" + promo + "\">" + promo +"</option>"
+                                }
+                                txt += "\n";
                             }
-                            txt += "\n";
-                        }
-                        template = template.toString().replace("%option%", txt);
-                        //console.log(template)
-                        console.log(template.toString());
-                        template = miseAJourPage(template, data[0]);
-                        res.end(template);
-                    })
-            })
-            .catch((err) => {
-                throw err; //Pour le moment on stoppe tout et on génère une erreur
-            })
+                            accueil = accueil.toString().replace("%option%", txt);
+                            accueil = miseAJourPage(accueil, data[0]);
+                            res.end(accueil);
+                        })
+                })
+                .catch((err) => {
+                    throw err; //Pour le moment on stoppe tout et on génère une erreur
+                })
+        });
     });
 });
 
@@ -107,6 +119,59 @@ router.get('/updated', (req, res, next) => {
                 res.end("ssaussure");
             }
         );
+});
+
+router.get("/delete", (req, res, next) => {
+    if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
+        res.end("Tu n'as rien à faire là");
+    }
+    const modelCreneaux = require(path.join(__dirname, '../model/creneaux'));
+    const modelParticipe = require(path.join(__dirname, '../model/participe'));
+    const modelgroupeProjet = require(path.join(__dirname, '../model/participe'));
+    const modelComposer = require(path.join(__dirname, '../model/participe'));
+    modelParticipe.truncate()
+        .then((pa) => {
+            console.log("Participe : " + pa)
+            modelCreneaux.truncate()
+                .then((ev) => {
+                    console.log("Creneaux : " + ev)
+                    modelEvenement.truncate()
+                        .then((cr) => {
+                            console.log("Evenement : " + cr)
+                            //TODO ?
+                        })
+                        .catch((err) => {
+                            console.log("Une erreur dans le truncate des événements");
+                            res.end(err);
+                        })
+                })
+                .catch((err) => {
+                    console.log("Une erreur dans le truncate des créneaux");
+                    res.end(err);
+                });
+        })
+        .catch((err) => {
+            console.log("Une erreur dans le truncate de participe (Créneaux / Prof)");
+            res.end(err);
+        })
+    modelComposer.truncate()
+        .then((com) => {
+            console.log("Composer : " + com)
+            modelgroupeProjet.truncate()
+                .then((pr) => {
+                    console.log("Groupe Projet : " + pr)
+                    //TODO ?
+                })
+                .catch((err) => {
+                    console.log("Une erreur dans le truncate des groupeprojet");
+                    res.end(err);
+                })
+        })
+        .catch((err) => {
+            console.log("Une erreur dans le truncate des Composer (Etudiants / groupeprojet)");
+            res.end(err);
+        })
+    res.end("événement supprimé");
 });
 
 module.exports = router;

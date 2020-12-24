@@ -14,7 +14,12 @@ router.get('/', (req, res, next) => {
     fs.readFile(path.join(__dirname, "view/Admin/index.html"), (err, template) => {
         if (err)
             throw err;
-        res.end(template.toString());
+        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+            let accueil = template.toString().replace('<header>%</header>', header.toString());
+            if (err)
+                throw err;
+            res.end(accueil.toString());
+        })
     });
 });
 
