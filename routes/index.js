@@ -40,7 +40,7 @@ router.get('/inscrit', function(req, res, next) {
         //Gère l'affichage de l'inputPromo en fonction des promo dans la DB
         db.query("SELECT annee FROM promotion;",(err, result)=> {
             if (err) throw err;
-            let text = '<option selected disabled>Choisi ta promo</option>';
+            let text = '<option selected disabled value="" >Choisis ta promo</option>';
             let string = JSON.parse(JSON.stringify(result));
             for (let promo of string) {
                 text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
