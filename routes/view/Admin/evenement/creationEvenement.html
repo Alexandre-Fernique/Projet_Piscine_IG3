@@ -1,0 +1,74 @@
+<!--Page de création d'un evenement-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Evenement</title>
+    <link rel="icon" href="images/logo.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!--Importer les icônes-->
+    <link rel="stylesheet" href="/stylesheets/evenement.css">
+
+</head>
+<body class="container">
+<header>%</header>
+<div>
+    <form action="/admin/evenement/created" method="get">
+        <div class="center">
+			<h4>Nom évenement</h4>
+			<input id="nomEvent" class="form-control" type="text" name="nomEvent">
+        </div>
+        </br>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="dateDebut">
+                    Date de début (JJ/MM/AAAA)
+                </label>
+                <input id="dateDebut" class="form-control" type="date" name="dateDebut">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="Duree">
+                    Durée en jours
+                </label>
+                <input id="Duree" type="number" class="form-control" name="Duree">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="dateLimiteResa">
+                    Date de fin des réservations (JJ/MM/AAAA)
+                </label>
+                <input id="dateLimiteResa" type="date" class="form-control" name="dateLimiteResa">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="dureeCreneau">
+                    Durée d'un créneau (HH:MM:SS)
+                </label>
+                <input id="dureeCreneau" type="text" class="form-control" name="dureeCreneau">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="nombreMembresJury">
+                    Nombre de membres du jury
+                </label>
+                <input id="nombreMembresJury" type="number" class="form-control" name="nombreMembresJury">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="anneePromo">
+                    Promotion concernée
+                </label>
+                <select name="anneePromo" id="anneePromo" class="form-control">
+					<option value="IG3">IG3</option>
+					<option value="IG4">IG4</option>
+					<option value="IG5">IG5</option>
+                </select>
+            </div>
+        </div>
+        <div class = "center">
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

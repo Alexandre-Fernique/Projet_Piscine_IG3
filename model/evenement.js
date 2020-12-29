@@ -1,6 +1,20 @@
 const path = require('path');
 const db = require(path.join(__dirname, '../bin/bdd'));
 
+function create (values) {
+    return new Promise((resolve, reject) => {
+        let sql = "INSERT INTO `evenements` (`nom` ,`dateDebut`, `Duree`, `dateLimiteResa`, `dureeCreneau`, `nombreMembresJury`, `anneePromo`) VALUES (?, ? ,?, ?, ?, ?, ?);";
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
+            else
+                resolve(result);
+        });
+    });
+}
+
 function update (values) {
     return new Promise((resolve, reject) => {
         //On fait une requête préparée (Elle permet de contrer les injections SQL)
@@ -63,4 +77,4 @@ function truncate () {
     }));
 }
 
-module.exports = {update, get, getAll, getAllPromotion, truncate};
+module.exports = {create, update, get, getAll, getAllPromotion, truncate};

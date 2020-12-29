@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const db = require(path.join(__dirname, '../bin/bdd')); // Permet la connexion à la base de données
 const auth = require (path.join(__dirname, '../bin/auth'));
 const jwt = require('jsonwebtoken');
 const htmlspecialchars = require('htmlspecialchars');
@@ -28,6 +29,61 @@ function miseAJourPage (template, donnee) {
     template = template.toString().replace('%anneePromo%', htmlspecialchars(donnee.anneePromo));
     return template;
 }
+
+router.get('/create', (req, res, next) => { //Création de l'évenement
+    if (auth(req, res, next) !== 1) {
+        res.end("T'as rien à faire là ");
+    }
+    console.log("OK");
+    fs.readFile(path.join(__dirname, "view/Admin/evenement/creationEvenement.html"), (err, template) => {
+        if (err)
+            throw err;
+        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+            let accueil = template.toString().replace('<header>%</header>', header.toString());
+            res.end(accueil)
+        });    
+    });
+});
+
+router.get('/created', (req, res, next) => { 
+    if (auth(req, res, next) !== 1) {
+        res.end("T'as rien à faire là ");
+    }
+    let nomEvent = req.query.nomEvent;
+    let dateDebut = req.query.dateDebut;
+    let Duree = req.query.Duree;
+    let dateLimiteResa = req.query.dateLimiteResa;
+    let dureeCreneau = req.query.dureeCreneau;
+    let nombreMembresJury = req.query.nombreMembresJury;
+    let anneePromo = req.query.anneePromo;
+
+    let sql = "SELECT * FROM `evenements` WHERE nom='"+nomEvent+"' && anneePromo='"+anneePromo+"';";
+    db.query(sql, (err, row) => {    
+        if (err) throw err;
+        if (row && row.length ) {
+            console.log('Evenement existe déjà dans la base de données!');
+            let alert = require('alert');  
+            alert("L'évenement "+ nomEvent +" concernant la promo "+ anneePromo +" existe déjà !")
+            res.writeHead(302, {'Location': '/admin/evenement/create'});
+            res.end();
+        } else {
+            modelEvenement.create([nomEvent ,dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo])
+                .then((retour) => {
+                    console.log(retour);
+                    res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
+                    res.end();
+                })
+                .catch(
+                    function () {
+                        console.log("Une erreur est survenue dans la fonction");
+                        res.end("ssaussure");
+                    }
+                );
+        }
+    });
+});
+
+
 router.get('/list', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
