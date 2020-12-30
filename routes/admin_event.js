@@ -11,13 +11,13 @@ const modelEvenement = require(path.join(__dirname, '../model/evenement'));
 
 
 function miseAJourPage (template, donnee) {
+    let num = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
+
     let dateDebut = new Date(String(donnee.dateDebut));
-    let mois = dateDebut.getMonth()+1;
-    donnee.dateDebut = dateDebut.getFullYear() + "-" + mois + "-" + dateDebut.getDate();
+    donnee.dateDebut = dateDebut.getFullYear() + "-" + num[dateDebut.getMonth()] + "-" + num[dateDebut.getDate()];
 
     let dateLimiteResa = new Date(String(donnee.dateLimiteResa));
-    let mois2 = dateLimiteResa.getMonth()+1;
-    donnee.dateLimiteResa = dateLimiteResa.getFullYear() + "-" + mois2 + "-" + dateLimiteResa.getDate();
+    donnee.dateLimiteResa = dateLimiteResa.getFullYear() + "-" + num[dateLimiteResa.getMonth()] + "-" + num[dateLimiteResa.getDate()];
 
     template = template.toString().replace('%id%', htmlspecialchars(donnee.id));
     template = template.toString().replace('%dateDebut%', htmlspecialchars(donnee.dateDebut));
