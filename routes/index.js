@@ -60,27 +60,34 @@ Rediriger vers une page d'erreur si jamais il y a un problème:
     - (Il faut proposer uniquement les promotions qui sont disponibles)
     - Gérer si l'utilisateur à déjà un compte avec ce numéro étudiant
  */
-router.get("/inscription", (req, res, next) => {
+router.post("/inscription", (req, res, next) => {
     //req.query -> Récupérer dans l'url
     //req.body -> Récupérer en POST (Dans le corps de la requête)
     //req.method -> Connaitre la méthode utilisée
-    let numero = req.query.numeroEt;
-    let nom = req.query.inputNom;
-    let mail = req.query.inputEmail;
+    let body =JSON.parse(JSON.stringify(req.body)); //récupère les infos dans le corp de la requête
+    let numero = body.numeroEt;
+    let nom = body.inputNom;
+    let mail = body.inputEmail;
     //Pour le mot de passe "qsd" (entré par l'utilisateur), on obtient le hash suivant : sha1$f83e199e$1$91fb956a0417ad5a1726e19c37b046f2f7582324
-    let mdp = passwordHash.generate(cle + req.query.inputMdp); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
-    let prenom = req.query.inputPrenom;
-    let promo = req.query.selectPromo;
+    let mdp = passwordHash.generate(cle + body.inputMdp); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
+    let prenom = body.inputPrenom;
+    let promo = body.selectPromo;
 
     modelEtudiant.create([numero, nom, prenom, mail, mdp, promo])
         .then((value) => {
             res.writeHead(302, {'Location': '/'});
             res.end("Terminé");
         })
-        .catch(
-            function () {
-                console.log("Une erreur est survenue dans la fonction");
-                res.end("ssaussure");
+        .catch(()=> {
+                //Erreur lors de la création d'un étudiant dans la DB (numéro étudiant déja présent dans la DB ou champs ne respectant pas les spécif de la DB)
+                let text = `<div class="alert alert-danger" role="alert">
+  Numéro étudiant déjà existant. Veuillez contacter votre admnistrateur
+</div>`;
+                fs.readFile(__dirname + '/view/accueil/inscription.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                    if (err)
+                        throw err;
+                    res.end(template.toString().replace("<ereur></ereur>", text));
+                });
             }
         );
     //res.end("J'ai fini"); //Retourner une page d'inscription terminée
@@ -93,15 +100,14 @@ Gérer la redirection de l'utilisateur en fonction de ce qui a été capté :
     - Utilisateur connecté
     - Ce système ne permet que la connexion par la base de données, c'est à dire pour les étudiants
  */
-router.get("/connexion", (req, res, next) => {
+router.post("/connexion", (req, res, next) => {
     //Faudra trouver un moyen plus secure de faire ça hein
     let mdpAdmin = passwordHash.generate(cle + "secure");
     let mailAdmin = "mail@admin.fr";
-
-    let mail = req.query.Email;
-    let mdp = cle + req.query.mdp;
-    let cookieTime = req.query.remember;
-
+    let body =JSON.parse(JSON.stringify(req.body));//récupère les info dans le corp de la requête
+    let mail = body.Email;
+    let mdp = cle + body.mdp;
+    let cookieTime = body.remember;
     if (mailAdmin === mail && passwordHash.verify(mdp, mdpAdmin)) {
         let token = jwt.sign({
                 rang_utilisateur: 1, //On lui donne le rang d'un admin
@@ -123,8 +129,12 @@ router.get("/connexion", (req, res, next) => {
             if (err)
                 throw err;
             if (result[0] == null ) {
-                res.writeHead(302, {'Location': '/?er=mail'});
-                res.end("Mail inexistant"); //Adresse mail inexistante
+                //Affichage erreur mot de passe et email. l'email n'est pas présent dans la DB
+                fs.readFile(__dirname +  '/view/accueil/connexion.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                    if(err)
+                        throw err;
+                    res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid" value="'+body.Email+'"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
+                });
             } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
                 let token = jwt.sign({
                         rang_utilisateur: 0, //On lui donne le rang d'un étudiant
@@ -140,9 +150,13 @@ router.get("/connexion", (req, res, next) => {
                 res.writeHead(302, {'Location': '/'});
                 res.status(200).end("Connecté");
             } else {
-                res.end("Erreur de mot de passe"); //Il a un problème de mot de passe
+                //Affichage erreur mot de passe et email. erreur de mot de passe
+                fs.readFile(__dirname +  '/view/accueil/connexion.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                    if(err)
+                        throw err;
+                    res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
+                });
             }
-
         });
     }
 });
