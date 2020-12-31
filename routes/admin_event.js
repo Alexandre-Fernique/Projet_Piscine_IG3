@@ -6,6 +6,7 @@ const db = require(path.join(__dirname, '../bin/bdd')); // Permet la connexion �
 const auth = require (path.join(__dirname, '../bin/auth'));
 const jwt = require('jsonwebtoken');
 const htmlspecialchars = require('htmlspecialchars');
+const recupParam = require(path.join(__dirname, '../bin/paramRecup'));
 
 const modelEvenement = require(path.join(__dirname, '../model/evenement'));
 
@@ -30,7 +31,7 @@ function miseAJourPage (template, donnee) {
     return template;
 }
 
-router.get('/create', (req, res, next) => { //Création de l'évenement
+router.all('/create', (req, res, next) => { //Création de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
     }
@@ -45,17 +46,17 @@ router.get('/create', (req, res, next) => { //Création de l'évenement
     });
 });
 
-router.get('/created', (req, res, next) => { 
+router.all('/created', (req, res, next) => {
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
     }
-    let nomEvent = req.query.nomEvent;
-    let dateDebut = req.query.dateDebut;
-    let Duree = req.query.Duree;
-    let dateLimiteResa = req.query.dateLimiteResa;
-    let dureeCreneau = req.query.dureeCreneau;
-    let nombreMembresJury = req.query.nombreMembresJury;
-    let anneePromo = req.query.anneePromo;
+    let nomEvent = recupParam(req, "nomEvent");
+    let dateDebut = recupParam(req, "dateDebut");
+    let Duree = recupParam(req, "Duree");
+    let dateLimiteResa = recupParam(req, "dateLimiteResa");
+    let dureeCreneau = recupParam(req, "dureeCreneau");
+    let nombreMembresJury = recupParam(req, "nombreMembresJury");
+    let anneePromo = recupParam(req, "anneePromo");
 
     let sql = "SELECT * FROM `evenements` WHERE nom='"+nomEvent+"' && anneePromo='"+anneePromo+"';";
     db.query(sql, (err, row) => {    
@@ -84,7 +85,7 @@ router.get('/created', (req, res, next) => {
 });
 
 
-router.get('/list', (req, res, next) => { //Afficher le détail de l'évenement
+router.all('/list', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
     }
@@ -114,7 +115,7 @@ router.get('/list', (req, res, next) => { //Afficher le détail de l'évenement
     });
 });
 
-router.get('/update', (req, res, next) => { //Afficher le détail de l'évenement
+router.all('/update', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("Tu n'as rien à faire là");
     }
@@ -151,18 +152,18 @@ router.get('/update', (req, res, next) => { //Afficher le détail de l'évenemen
     });
 });
 
-router.get('/updated', (req, res, next) => {
+router.all('/updated', (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
     }
-    let id = req.query.id;
-    let nomEvent = req.query.nomEvent;
-    let dateDebut = req.query.dateDebut;
-    let Duree = req.query.Duree;
-    let dateLimiteResa = req.query.dateLimiteResa;
-    let dureeCreneau = req.query.dureeCreneau;
-    let nombreMembresJury = req.query.nombreMembresJury;
-    let anneePromo = req.query.anneePromo;
+    let id = recupParam(req, "id");
+    let nomEvent = recupParam(req, "nomEvent");
+    let dateDebut = recupParam(req, "dateDebut");
+    let Duree = recupParam(req, "Duree");
+    let dateLimiteResa = recupParam(req, "dateLimiteResa");
+    let dureeCreneau = recupParam(req, "dureeCreneau");
+    let nombreMembresJury = recupParam(req, "nombreMembresJury");
+    let anneePromo = recupParam(req, "anneePromo");
     modelEvenement.update([nomEvent, dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo, id])
         .then((retour) => {
             console.log(retour);
@@ -177,7 +178,7 @@ router.get('/updated', (req, res, next) => {
         );
 });
 
-router.get("/delete", (req, res, next) => {
+router.all("/delete", (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
     }

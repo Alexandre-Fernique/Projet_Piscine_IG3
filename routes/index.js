@@ -6,6 +6,7 @@ const passwordHash = require('password-hash'); // Permet le hashage du mot de pa
 const db = require(path.join(__dirname, '../bin/bdd')); // Permet la connexion à la base de données
 const jwt = require('jsonwebtoken'); // Permet l'encodage des tokens (+ sécurité)
 const auth = require(path.join(__dirname, '../bin/auth')); // Permet la gestion de l'authentification de l'utilisateur
+const recupParam = require(path.join(__dirname, '../bin/paramRecup'));
 
 const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
 
@@ -64,14 +65,13 @@ router.post("/inscription", (req, res, next) => {
     //req.query -> Récupérer dans l'url
     //req.body -> Récupérer en POST (Dans le corps de la requête)
     //req.method -> Connaitre la méthode utilisée
-    let body =JSON.parse(JSON.stringify(req.body)); //récupère les infos dans le corp de la requête
-    let numero = body.numeroEt;
-    let nom = body.inputNom;
-    let mail = body.inputEmail;
+    let numero = recupParam(req, "numeroEt");
+    let nom = recupParam(req, "inputNom");
+    let mail = recupParam(req, "inputEmail");
     //Pour le mot de passe "qsd" (entré par l'utilisateur), on obtient le hash suivant : sha1$f83e199e$1$91fb956a0417ad5a1726e19c37b046f2f7582324
-    let mdp = passwordHash.generate(cle + body.inputMdp); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
-    let prenom = body.inputPrenom;
-    let promo = body.selectPromo;
+    let mdp = passwordHash.generate(cle + recupParam(req, "inputMdp")); //On va hasher le mot de passer, c'est à dire qu'on va faire plein de modification dessus pour qu'il en soit pas lisible ou facilement trouvable si jamais la base de données fuite
+    let prenom = recupParam(req, "inputPrenom");
+    let promo = recupParam(req, "selectPromo");
 
     modelEtudiant.create([numero, nom, prenom, mail, mdp, promo])
         .then((value) => {
@@ -80,9 +80,9 @@ router.post("/inscription", (req, res, next) => {
         })
         .catch(()=> {
                 //Erreur lors de la création d'un étudiant dans la DB (numéro étudiant déja présent dans la DB ou champs ne respectant pas les spécif de la DB)
-                let text = `<div class="alert alert-danger" role="alert">
-  Numéro étudiant déjà existant. Veuillez contacter votre admnistrateur
-</div>`;
+                let text = `<div class="alert alert-danger" role="alert">`
+                                + `Numéro étudiant déjà existant. Veuillez contacter votre admnistrateur`
+                            + `</div>`;
                 fs.readFile(__dirname + '/view/accueil/inscription.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
                     if (err)
                         throw err;
@@ -90,7 +90,6 @@ router.post("/inscription", (req, res, next) => {
                 });
             }
         );
-    //res.end("J'ai fini"); //Retourner une page d'inscription terminée
 });
 
 /*
@@ -105,9 +104,9 @@ router.post("/connexion", (req, res, next) => {
     let mdpAdmin = passwordHash.generate(cle + "secure");
     let mailAdmin = "mail@admin.fr";
     let body =JSON.parse(JSON.stringify(req.body));//récupère les info dans le corp de la requête
-    let mail = body.Email;
-    let mdp = cle + body.mdp;
-    let cookieTime = body.remember;
+    let mail = recupParam(req, "Email");
+    let mdp = cle + recupParam(req, "mdp");
+    let cookieTime = recupParam(req, "remember");
     if (mailAdmin === mail && passwordHash.verify(mdp, mdpAdmin)) {
         let token = jwt.sign({
                 rang_utilisateur: 1, //On lui donne le rang d'un admin
