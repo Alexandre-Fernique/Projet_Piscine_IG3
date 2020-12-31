@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const auth = require (path.join(__dirname, '../bin/auth'));
+const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 const htmlspecialchars = require('htmlspecialchars');
 

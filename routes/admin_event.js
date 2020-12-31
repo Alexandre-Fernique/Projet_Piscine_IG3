@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const db = require(path.join(__dirname, '../bin/bdd')); // Permet la connexion à la base de données
-const auth = require (path.join(__dirname, '../bin/auth'));
+const db = require(path.join(__dirname, '..', 'bin', 'bdd')); // Permet la connexion à la base de données
+const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 const htmlspecialchars = require('htmlspecialchars');
-const recupParam = require(path.join(__dirname, '../bin/paramRecup'));
+const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
-const modelEvenement = require(path.join(__dirname, '../model/evenement'));
+const modelEvenement = require(path.join(__dirname, '..', 'model', 'evenement'));
 
 
 function miseAJourPage (template, donnee) {
@@ -36,10 +36,10 @@ router.all('/create', (req, res, next) => { //Création de l'évenement
         res.end("T'as rien à faire là ");
     }
     console.log("OK");
-    fs.readFile(path.join(__dirname, "view/Admin/evenement/creationEvenement.html"), (err, template) => {
+    fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'creationEvenement.html'), (err, template) => {
         if (err)
             throw err;
-        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
             let accueil = template.toString().replace('<header>%</header>', header.toString());
             res.end(accueil)
         });    
@@ -89,10 +89,10 @@ router.all('/list', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
     }
-    fs.readFile(path.join(__dirname, "view/Admin/evenement/detail.html"), (err, template) => {
+    fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'detail.html'), (err, template) => {
         if (err)
             throw err;
-        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
             let accueil = template.toString().replace('<header>%</header>', header.toString());
             modelEvenement.getAll()
                 .then((data) => {
@@ -103,7 +103,7 @@ router.all('/list', (req, res, next) => { //Afficher le détail de l'évenement
                         res.end(accueil);
                     }
                     else {
-                        fs.readFile(path.join(__dirname, "view/Admin/evenement/pasEvenement.html"), (err, content) => {
+                        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenement.html'), (err, content) => {
                             res.end(content);
                         });
                     }
@@ -119,10 +119,10 @@ router.all('/update', (req, res, next) => { //Afficher le détail de l'évenemen
     if (auth(req, res, next) !== 1) {
         res.end("Tu n'as rien à faire là");
     }
-    fs.readFile(path.join(__dirname, "view/Admin/evenement/update.html"), (err, template) => {
+    fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'update.html'), (err, template) => {
         if (err)
             throw err;
-        fs.readFile(path.join(__dirname, "view/Admin/header.html"), (err, header) => {
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
             if (err)
                 throw err;
             let accueil = template.toString().replace('<header>%</header>', header.toString());
@@ -182,10 +182,10 @@ router.all("/delete", (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
     }
-    const modelCreneaux = require(path.join(__dirname, '../model/creneaux'));
-    const modelParticipe = require(path.join(__dirname, '../model/participe'));
-    const modelgroupeProjet = require(path.join(__dirname, '../model/participe'));
-    const modelComposer = require(path.join(__dirname, '../model/participe'));
+    const modelCreneaux = require(path.join(__dirname, '..', 'model', 'creneaux'));
+    const modelParticipe = require(path.join(__dirname, '..', 'model', 'participe'));
+    const modelgroupeProjet = require(path.join(__dirname, '..', 'model', 'groupeProjet'));
+    const modelComposer = require(path.join(__dirname, '..', 'model', 'composer'));
     modelParticipe.truncate()
         .then((pa) => {
             console.log("Participe : " + pa)

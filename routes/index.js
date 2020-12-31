@@ -3,12 +3,12 @@ const router = express.Router();
 const fs = require('fs'); // Permet la lecture de fichier
 const path = require('path'); // Permet la création de chemin absolu -> Evite de créer des problèmes de chemin entre les différentes OS
 const passwordHash = require('password-hash'); // Permet le hashage du mot de passe
-const db = require(path.join(__dirname, '../bin/bdd')); // Permet la connexion à la base de données
+const db = require(path.join(__dirname, '..', 'bin', 'bdd')); // Permet la connexion à la base de données
 const jwt = require('jsonwebtoken'); // Permet l'encodage des tokens (+ sécurité)
-const auth = require(path.join(__dirname, '../bin/auth')); // Permet la gestion de l'authentification de l'utilisateur
-const recupParam = require(path.join(__dirname, '../bin/paramRecup'));
+const auth = require(path.join(__dirname, '..', 'bin', 'auth')); // Permet la gestion de l'authentification de l'utilisateur
+const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
-const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
+const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
@@ -18,7 +18,7 @@ var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe v
 router.get('/', function(req, res, next) {
     let identification_status = auth(req, res, next);
     if (identification_status === 2) { // Il n'est pas connecté
-        fs.readFile(__dirname +  '/view/accueil/connexion.html', (err, template) => { //Page de connexion -> Utilisateur non connecté
+        fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page de connexion -> Utilisateur non connecté
             if (err)
                 throw err;
             res.end(template)
@@ -35,7 +35,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/inscrit', function(req, res, next) {
-    fs.readFile(__dirname +  '/view/accueil/inscription.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
+    fs.readFile(path.join(__dirname ,'view', 'accueil', 'inscription.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
         if (err)
             throw err;
         //Gère l'affichage de l'inputPromo en fonction des promo dans la DB
@@ -103,7 +103,6 @@ router.post("/connexion", (req, res, next) => {
     //Faudra trouver un moyen plus secure de faire ça hein
     let mdpAdmin = passwordHash.generate(cle + "secure");
     let mailAdmin = "mail@admin.fr";
-    let body =JSON.parse(JSON.stringify(req.body));//récupère les info dans le corp de la requête
     let mail = recupParam(req, "Email");
     let mdp = cle + recupParam(req, "mdp");
     let cookieTime = recupParam(req, "remember");
@@ -129,10 +128,10 @@ router.post("/connexion", (req, res, next) => {
                 throw err;
             if (result[0] == null ) {
                 //Affichage erreur mot de passe et email. l'email n'est pas présent dans la DB
-                fs.readFile(__dirname +  '/view/accueil/connexion.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
                     if(err)
                         throw err;
-                    res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid" value="'+body.Email+'"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
+                    res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid" value="'+recupParam(req, "Email")+'"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
                 });
             } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
                 let token = jwt.sign({
@@ -150,7 +149,7 @@ router.post("/connexion", (req, res, next) => {
                 res.status(200).end("Connecté");
             } else {
                 //Affichage erreur mot de passe et email. erreur de mot de passe
-                fs.readFile(__dirname +  '/view/accueil/connexion.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
                     if(err)
                         throw err;
                     res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));

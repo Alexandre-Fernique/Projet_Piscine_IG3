@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const auth = require (path.join(__dirname, '../bin/auth'));
+const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 //Lorsqu'on veut afficher quelque chose rentré par l'utilsateur on empêche la page d'intépreter l'html
 //Si son nom est "<h1>Chiant" on ne veut pas que cela détruise notre affiche en interprétant la balise h1 mais bien qu'il affiche cela comme le nom
 const htmlspecialchars = require('htmlspecialchars');
 
-const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
+const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 
 /* GET users listing. */
 
@@ -24,10 +24,10 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
         res.writeHead(302, {'Location': '/'});
         res.end();
     }
-    fs.readFile(__dirname +  '/view/User/Accueil_User.html', (err, template) => { //Page d'accueil -> étudiant connecté
+    fs.readFile(path.join(__dirname, 'view', 'User', 'Accueil_User.html'), (err, template) => { //Page d'accueil -> étudiant connecté
         if (err)
             throw err;
-        fs.readFile(__dirname + '/view/header.html', (err, header) => {
+        fs.readFile(path.join(__dirname, 'view', 'header.html'), (err, header) => {
             if (err)
                 throw err;
             let token = req.cookies['token'];
@@ -100,7 +100,7 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
 });
 
 router.get('/list', function(req, res, next) {
-    res.status(200).sendFile(__dirname +  '/view/users.html');
+    res.status(200).sendFile(path.join(__dirname, 'view', 'users.html'));
 });
 //S'occupe de la réservation d'un créneau pour un étudiant
 router.get('/reservation/:id', function(req, res, next) {
