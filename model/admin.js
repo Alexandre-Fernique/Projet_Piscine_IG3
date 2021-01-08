@@ -15,7 +15,7 @@ num est le numéro de l'admin (La clé primaire de la table)
  */
 function get (column, id) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT " + column + " FROM `evenements` WHERE id=" + id + ";";
+        let sql = "SELECT " + column + " FROM `etudiants` WHERE numero=" + id + ";";
         db.query(sql, (err, result) => {
             if (err) {
                 console.log(err);
@@ -53,7 +53,7 @@ function changeEvenements(id,idGroupe){
 /*
 Cette fonction est un getteur des créneaux(et leurs informations) en fonction de ta promo
 */
-function getEvent(anne,prof=false){
+function getEvent(prof=false){
     return new Promise((resolve ,reject)=>{
         //requete pour avoir tout les creneaux
         //"SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle` FROM `evenements`,`creneaux` WHERE evenements.id=idEvenement and anneePromo='" + anne + "';"
@@ -70,7 +70,7 @@ function getEvent(anne,prof=false){
             });
         }
         else{
-            let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`,`idGroupeProjet` FROM `evenements`,`creneaux`,`participe` WHERE evenements.id=idEvenement and creneaux.id!=idCreneaux and " + ' GROUP BY creneaux.id;';
+            let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`,`idGroupeProjet` FROM `evenements`,`creneaux`,`participe` WHERE evenements.id=idEvenement and creneaux.id!=idCreneaux " + ' GROUP BY creneaux.id;';
             //requete pour avoir les prof en plus
             // SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`, professeurs.nom,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='IG3';
             db.query(sql, (err, result) => {
