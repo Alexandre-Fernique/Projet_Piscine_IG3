@@ -1,6 +1,6 @@
 const path = require('path');
 const db = require(path.join(__dirname, '../bin/bdd'));
-
+const passwordHash = require('password-hash'); // Permet le hashage du mot de passe
 
 /*
 Il faudra gérer les erreurs en fonction de ce qu'il se passe
@@ -117,4 +117,31 @@ function getEvent(anne,prof=false){
 
     });
 }
-module.exports = {create, get,getEvent,getGrpId,changeCreneaux };
+function changePassword(oldPassword,newPassword,num){
+    return new Promise((resolve,reject)=>{
+
+        let sql="SELECT `motDePasse` from `etudiants` where numero="+num+";";
+
+        db.query(sql,(err,result)=>{
+            if(err)
+                reject(err)
+            if(result===undefined)
+                reject("etudiant introuvable")
+            else if(passwordHash.verify(oldPassword,result[0].motDePasse)){
+                let sql="UPDATE `etudiants` SET `motDePasse` = ? WHERE `numero` = "+num+";";
+                db.query(sql,newPassword,(err,result)=>{
+                    if(err)
+                        reject(err)
+                    else {
+                        resolve("Done")
+                    }
+                })
+            }
+            else {
+                reject("Mot de passe différent")
+            }
+
+        })
+    })
+}
+module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword };

@@ -44,7 +44,8 @@ router.get('/inscrit', function(req, res, next) {
             let text = '<option selected disabled value="" >Choisis ta promo</option>';
             let string = JSON.parse(JSON.stringify(result));
             for (let promo of string) {
-                text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
+                if(promo['annee']!="Admin")
+                    text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
             }
             res.end(template.toString().replace('< option/>',text));
 
@@ -86,7 +87,17 @@ router.post("/inscription", (req, res, next) => {
                 fs.readFile(__dirname + '/view/accueil/inscription.html', (err, template) => { //Page d'inscription -> Utilisateur non connecté
                     if (err)
                         throw err;
-                    res.end(template.toString().replace("<ereur></ereur>", text));
+                    db.query("SELECT annee FROM promotion;",(err, result)=> {
+                        if (err) throw err;
+                        let texte = '<option selected disabled value="" >Choisis ta promo</option>';
+                        let string = JSON.parse(JSON.stringify(result));
+                        for (let promo of string) {
+                            if(promo['annee']!="Admin")
+                                texte += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
+                        }
+                        res.end(template.toString().replace('< option/>',texte).replace("<ereur></ereur>", text));
+
+                    })
                 });
             }
         );
@@ -101,39 +112,40 @@ Gérer la redirection de l'utilisateur en fonction de ce qui a été capté :
  */
 router.post("/connexion", (req, res, next) => {
     //Faudra trouver un moyen plus secure de faire ça hein
-    let mdpAdmin = passwordHash.generate(cle + "secure");
-    let mailAdmin = "mail@admin.fr";
+    /*let mdpAdmin = passwordHash.generate(cle + "secure");
+    console.log(passwordHash.generate(cle + "secure"));
+    let mailAdmin = "mail@admin.fr";*/
     let mail = recupParam(req, "Email");
     let mdp = cle + recupParam(req, "mdp");
     let cookieTime = recupParam(req, "remember");
-    if (mailAdmin === mail && passwordHash.verify(mdp, mdpAdmin)) {
-        let token = jwt.sign({
-                rang_utilisateur: 1, //On lui donne le rang d'un admin
-                numeroEt: -1 //On lui donne comme numéro étudiant -1 pour éviter que cela génère une erreur lors de l'appel
-            },
-            'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
-            { expiresIn: '24h' });
-        if (cookieTime === "ok") {
-            res.cookie('token', token, {expires: new Date(Date.now() + (3600000 * 24 * 30)), httpOnly: true}); //3600000  = 1 heure
-        } else {
-            res.cookie('token', token, {expires: 0, httpOnly: true});
-        }
-        res.writeHead(302, {'Location': '/'}); //On le retourne vers la page d'accueil admin
-        res.status(200).end();
-    } else {
-        let sql = "SELECT `numero` ,`motDePasse` FROM `etudiants` WHERE mail=?";
-        let values = [mail];
-        db.query(sql, values, (err, result) => {
-            if (err)
-                throw err;
-            if (result[0] == null ) {
-                //Affichage erreur mot de passe et email. l'email n'est pas présent dans la DB
-                fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
-                    if(err)
-                        throw err;
-                    res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid" value="'+recupParam(req, "Email")+'"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
-                });
-            } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
+    let sql = "SELECT `numero` ,`motDePasse` FROM `etudiants` WHERE mail=?";
+    let values = [mail];
+    db.query(sql, values, (err, result) => {
+        if (err)
+            throw err;
+        if (result[0] == null ) {
+            //Affichage erreur mot de passe et email. l'email n'est pas présent dans la DB
+            fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                if(err)
+                    throw err;
+                res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid" value="'+recupParam(req, "Email")+'"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
+            });
+
+        } else if (passwordHash.verify(mdp, result[0].motDePasse)) {
+            if (result[0].numero===-1){
+                let token = jwt.sign({
+                        rang_utilisateur: 1, //On lui donne le rang d'un admin
+                        numeroEt: result[0].numero
+                    },
+                    'RANDOM_TOKEN_SECRET', //A changer lors du passage en production et à sécuriser pour ne pas l'afficher en clair
+                    { expiresIn: '24h' });
+                if (cookieTime === "ok") {
+                    res.cookie('token', token, {expires: new Date(Date.now() + (3600000 * 24 * 30)), httpOnly: true}); //3600000  = 1 heure
+                } else {
+                    res.cookie('token', token, {expires: 0, httpOnly: true});
+                }
+            }
+            else {
                 let token = jwt.sign({
                         rang_utilisateur: 0, //On lui donne le rang d'un étudiant
                         numeroEt: result[0].numero
@@ -145,18 +157,18 @@ router.post("/connexion", (req, res, next) => {
                 } else {
                     res.cookie('token', token, {expires: 0, httpOnly: true});
                 }
-                res.writeHead(302, {'Location': '/'});
-                res.status(200).end("Connecté");
-            } else {
-                //Affichage erreur mot de passe et email. erreur de mot de passe
-                fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
-                    if(err)
-                        throw err;
-                    res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
-                });
             }
-        });
-    }
+            res.writeHead(302, {'Location': '/'});
+            res.status(200).end("Connecté");
+        } else {
+            //Affichage erreur mot de passe et email. erreur de mot de passe
+            fs.readFile(path.join(__dirname, 'view', 'accueil', 'connexion.html'), (err, template) => { //Page d'inscription -> Utilisateur non connecté
+                if(err)
+                    throw err;
+                res.end(template.toString().replace('"form-control mb-3"','"form-control mb-3 is-invalid"').replace('"form-control mb-3"','"form-control mb-3 is-invalid"'));
+            });
+        }
+    });
 });
 
 /*

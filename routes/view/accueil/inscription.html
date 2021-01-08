@@ -15,7 +15,6 @@
         //function rendant disponible le button valider si tout les champs sont rempli
         function test(){
             var button=document.getElementById("button")
-            console.log(champValider)
             if(champValider==7){
                 button.removeAttribute("disabled")
             }
@@ -25,7 +24,6 @@
         function checkPw(){
             var confmdp =document.getElementById("inputConfMdp")
             if(document.getElementById("inputMdp").value===confmdp.value){
-                console.log(document.getElementById("inputMdp").value)
                 if(confmdp.className!="form-control is-valid"){champValider++}
                 confmdp.className="form-control is-valid"
             }

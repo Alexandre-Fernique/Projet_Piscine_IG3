@@ -4,9 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
+const passwordHash = require('password-hash'); // Permet le hashage du mot de passe
 //Lorsqu'on veut afficher quelque chose rentré par l'utilsateur on empêche la page d'intépreter l'html
 //Si son nom est "<h1>Chiant" on ne veut pas que cela détruise notre affiche en interprétant la balise h1 mais bien qu'il affiche cela comme le nom
 const htmlspecialchars = require('htmlspecialchars');
+const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
 const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 
@@ -17,6 +19,9 @@ const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 // www.exemple.fr/user/cequonveut
 
 //localhost:3000/users/list
+// La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
+//ici, le mot de passe "lapin" devient "96706546lapin"
+var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe vérouillé
 
 router.get('/', (req, res, next) => { //Page d'accueil utilisateur
     let rang_utilisateur = auth(req, res, next);
@@ -102,6 +107,45 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
 router.get('/list', function(req, res, next) {
     res.status(200).sendFile(path.join(__dirname, 'view', 'users.html'));
 });
+
+router.get('/modifierMDP',(req,res,)=>{
+    fs.readFile(path.join(__dirname, 'view', 'User', 'ModificationMDP.html'),(err,template)=>{
+        if(err)
+            throw err;
+        fs.readFile(path.join(__dirname, 'view', 'header.html'), (err, header) => {
+            if (err)
+                throw err;
+
+            let token = req.cookies['token'];
+            const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+            modelEtudiant.get("prenom,anneePromo", decodedToken["numeroEt"]).then((requete) => {
+                //On ajoute Bonjour, <Prénom> dans l'entête
+                let headerPerso = header.toString().replace('%NOM%', htmlspecialchars(requete[0].prenom));
+                //On ajoute l'entête dans notre page
+                let accueil = template.toString().replace('<header>%</header>', headerPerso);
+                res.end(accueil);
+
+            }).catch( () => {
+                console.log("Problème");
+                res.end("Huston on a un problème"); // Faire une page d'erreur
+            });
+        })
+    })
+});
+
+router.post('/modifier',(req,res,)=>{
+    let oldPassword = cle + recupParam(req,"oldPassword")
+    let newPassword = passwordHash.generate(cle+recupParam(req,"newPassword"))
+    let token = req.cookies['token'];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    modelEtudiant.changePassword(oldPassword,newPassword,decodedToken["numeroEt"]).then((requete) => {
+        res.end("okay")
+
+    }).catch( () => {
+        res.end("Problème huston"); // Faire une page d'erreur
+    });
+})
+
 //S'occupe de la réservation d'un créneau pour un étudiant
 router.get('/reservation/:id', function(req, res, next) {
     let token = req.cookies['token'];
