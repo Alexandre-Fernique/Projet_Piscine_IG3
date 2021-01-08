@@ -11,14 +11,14 @@ const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 const modelEvenement = require(path.join(__dirname, '..', 'model', 'evenement'));
 
 
-function miseAJourPage (template, donnee) {
-    let num = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
+function miseAJourPage (template, donnee, id) {
+    let num = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
 
     let dateDebut = new Date(String(donnee.dateDebut));
-    donnee.dateDebut = dateDebut.getFullYear() + "-" + num[dateDebut.getMonth()] + "-" + num[dateDebut.getDate()];
+    donnee.dateDebut = dateDebut.getFullYear() + "-" + num[dateDebut.getMonth()+1] + "-" + num[dateDebut.getDate()];
 
     let dateLimiteResa = new Date(String(donnee.dateLimiteResa));
-    donnee.dateLimiteResa = dateLimiteResa.getFullYear() + "-" + num[dateLimiteResa.getMonth()] + "-" + num[dateLimiteResa.getDate()];
+    donnee.dateLimiteResa = dateLimiteResa.getFullYear() + "-" + num[dateLimiteResa.getMonth()+1] + "-" + num[dateLimiteResa.getDate()];
 
     template = template.toString().replace('%id%', htmlspecialchars(donnee.id));
     template = template.toString().replace('%dateDebut%', htmlspecialchars(donnee.dateDebut));
@@ -28,6 +28,7 @@ function miseAJourPage (template, donnee) {
     template = template.toString().replace('%dureeCreneau%', htmlspecialchars(donnee.dureeCreneau));
     template = template.toString().replace('%nombreMembresJury%', htmlspecialchars(donnee.nombreMembresJury));
     template = template.toString().replace('%anneePromo%', htmlspecialchars(donnee.anneePromo));
+    template = template.toString().replace(new RegExp(':id', 'gi'), id);
     return template;
 }
 
@@ -85,37 +86,78 @@ router.all('/created', (req, res, next) => {
 });
 
 
-router.all('/list', (req, res, next) => { //Afficher le détail de l'évenement
+router.all('/read/:id', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
-    }
-    fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'detail.html'), (err, template) => {
-        if (err)
-            throw err;
-        fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
-            let accueil = template.toString().replace('<header>%</header>', header.toString());
-            modelEvenement.getAll()
-                .then((data) => {
-                    console.log("data : " + data.length > 0);
-                    if (data.length > 0) {
-                        accueil = miseAJourPage(accueil, data[0]);
-                        //template = template.toString().replace('disabled', ''); Pour la modification de l'événement, si on utilise la même page hmtl
-                        res.end(accueil);
-                    }
-                    else {
-                        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenement.html'), (err, content) => {
-                            res.end(content);
-                        });
-                    }
-                })
-                .catch((err) => {
-                    throw err; //Pour le moment on stoppe tout et on génère une erreur
-                })
+    } else {
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'detail.html'), (err, template) => {
+            if (err)
+                throw err;
+            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                let accueil = template.toString().replace('<header>%</header>', header.toString());
+                modelEvenement.getByPromotion(req.params.id)
+                    .then((data) => {
+                        if (data.length > 0) { //l'évenement recherché existe bien
+                            accueil = miseAJourPage(accueil, data[0], req.params.id);
+                            //template = template.toString().replace('disabled', ''); Pour la modification de l'événement, si on utilise la même page hmtl
+                            res.end(accueil);
+                        }
+                        else { //Notre événement n'existe pas
+                            fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenement.html'), (err, content) => {
+                                res.end(content);
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        throw err; //Pour le moment on stoppe tout et on génère une erreur
+                    })
+            });
         });
-    });
+    }
 });
 
-router.all('/update', (req, res, next) => { //Afficher le détail de l'évenement
+router.all('/list', (req, res, next) => {
+    if (auth(req, res, next) !== 1) {
+        res.end("T'as rien à faire là ");
+    } else {
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'list.html'), (err, template) => {
+            if (err)
+                throw err;
+            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                let page = template.toString().replace('<header>%</header>', header.toString());
+                modelEvenement.getAll()
+                    .then((data) => {
+                        if (data.length > 0) { //On a pu trouver un événement dans notre base de donnée
+                            let tmp, resultat = "";
+                            for (let i = 0; i < data.length; i++) {
+                                tmp = '<div class="col-md-4 card" style="width: 18rem;">' +
+                                            '<div class="card-body">' +
+                                                '<h5 class="card-title">' + data[i].nom + '</h5>' +
+                                                '<h6 class="card-subtitle mb-2 text-muted">' + data[i].anneePromo +'</h6>' +
+                                                '<a href="/admin/evenement/read/'+ data[i].anneePromo +'" class="card-link">Voir l\'événement</a>' +
+                                            '</div>' +
+                                        '</div>'
+                                resultat += tmp;
+                            }
+                            console.log(resultat)
+                            page = page.toString().replace('<evenements>%</evenements>', resultat.toString());
+                            res.end(page);
+                        }
+                        else {
+                            fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenement.html'), (err, content) => {
+                                res.end(content);
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        res.end(err);
+                    })
+            });
+        })
+    }
+})
+
+router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("Tu n'as rien à faire là");
     }
@@ -126,22 +168,20 @@ router.all('/update', (req, res, next) => { //Afficher le détail de l'évenemen
             if (err)
                 throw err;
             let accueil = template.toString().replace('<header>%</header>', header.toString());
-            modelEvenement.getAll()
+            modelEvenement.getByPromotion(req.params.id)
                 .then((data) => {
-                    modelEvenement.getAllPromotion()
+                    modelEvenement.getAllPromotionAvailable()
                         .then((listePromotion) => {
-                            let txt = ""; let promo;
+                            let promo;
+                            let txt = "<option value = \"" + req.params.id + "\" selected>" + req.params.id +"</option> \n";
                             for (let i = 0; i < listePromotion.length; i ++) {
                                 promo = listePromotion[i].annee;
-                                if (promo === data[0].anneePromo) {
-                                    txt += "<option value = \"" + promo + "\" selected>" + promo +"</option>";
-                                } else {
+
                                     txt += "<option value = \"" + promo + "\">" + promo +"</option>"
-                                }
                                 txt += "\n";
                             }
                             accueil = accueil.toString().replace("%option%", txt);
-                            accueil = miseAJourPage(accueil, data[0]);
+                            accueil = miseAJourPage(accueil, data[0], req.params.id);
                             res.end(accueil);
                         })
                 })
@@ -167,7 +207,7 @@ router.all('/updated', (req, res, next) => {
     modelEvenement.update([nomEvent, dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo, id])
         .then((retour) => {
             console.log(retour);
-            res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
+            res.writeHead(302, {'Location': '/admin/evenement/read/' + anneePromo}); //On le redirige vers la vue de cet évenement
             res.end();
         })
         .catch(
@@ -178,7 +218,7 @@ router.all('/updated', (req, res, next) => {
         );
 });
 
-router.all("/delete", (req, res, next) => {
+router.all("/delete/:id", (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
     }
