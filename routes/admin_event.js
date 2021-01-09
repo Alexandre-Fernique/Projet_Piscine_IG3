@@ -35,54 +35,56 @@ function miseAJourPage (template, donnee, id) {
 router.all('/create', (req, res, next) => { //Création de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
+    } else {
+        console.log("OK");
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'creationEvenement.html'), (err, template) => {
+            if (err)
+                throw err;
+            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                let accueil = template.toString().replace('<header>%</header>', header.toString());
+                res.end(accueil)
+            });
+        });
     }
-    console.log("OK");
-    fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'creationEvenement.html'), (err, template) => {
-        if (err)
-            throw err;
-        fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
-            let accueil = template.toString().replace('<header>%</header>', header.toString());
-            res.end(accueil)
-        });    
-    });
 });
 
 router.all('/created', (req, res, next) => {
     if (auth(req, res, next) !== 1) {
         res.end("T'as rien à faire là ");
-    }
-    let nomEvent = recupParam(req, "nomEvent");
-    let dateDebut = recupParam(req, "dateDebut");
-    let Duree = recupParam(req, "Duree");
-    let dateLimiteResa = recupParam(req, "dateLimiteResa");
-    let dureeCreneau = recupParam(req, "dureeCreneau");
-    let nombreMembresJury = recupParam(req, "nombreMembresJury");
-    let anneePromo = recupParam(req, "anneePromo");
+    } else {
+        let nomEvent = recupParam(req, "nomEvent");
+        let dateDebut = recupParam(req, "dateDebut");
+        let Duree = recupParam(req, "Duree");
+        let dateLimiteResa = recupParam(req, "dateLimiteResa");
+        let dureeCreneau = recupParam(req, "dureeCreneau");
+        let nombreMembresJury = recupParam(req, "nombreMembresJury");
+        let anneePromo = recupParam(req, "anneePromo");
 
-    let sql = "SELECT * FROM `evenements` WHERE nom='"+nomEvent+"' && anneePromo='"+anneePromo+"';";
-    db.query(sql, (err, row) => {    
-        if (err) throw err;
-        if (row && row.length ) {
-            console.log('Evenement existe déjà dans la base de données!');
-            let alert = require('alert');  
-            alert("L'évenement "+ nomEvent +" concernant la promo "+ anneePromo +" existe déjà !")
-            res.writeHead(302, {'Location': '/admin/evenement/create'});
-            res.end();
-        } else {
-            modelEvenement.create([nomEvent ,dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo])
-                .then((retour) => {
-                    console.log(retour);
-                    res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
-                    res.end();
-                })
-                .catch(
-                    function () {
-                        console.log("Une erreur est survenue dans la fonction");
-                        res.end("ssaussure");
-                    }
-                );
-        }
-    });
+        let sql = "SELECT * FROM `evenements` WHERE nom='"+nomEvent+"' && anneePromo='"+anneePromo+"';";
+        db.query(sql, (err, row) => {
+            if (err) throw err;
+            if (row && row.length ) {
+                console.log('Evenement existe déjà dans la base de données!');
+                let alert = require('alert');
+                alert("L'évenement "+ nomEvent +" concernant la promo "+ anneePromo +" existe déjà !")
+                res.writeHead(302, {'Location': '/admin/evenement/create'});
+                res.end();
+            } else {
+                modelEvenement.create([nomEvent ,dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo])
+                    .then((retour) => {
+                        console.log(retour);
+                        res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
+                        res.end();
+                    })
+                    .catch(
+                        function () {
+                            console.log("Une erreur est survenue dans la fonction");
+                            res.end("ssaussure");
+                        }
+                    );
+            }
+        });
+    }
 });
 
 
@@ -160,115 +162,118 @@ router.all('/list', (req, res, next) => {
 router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
         res.end("Tu n'as rien à faire là");
-    }
-    fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'update.html'), (err, template) => {
-        if (err)
-            throw err;
-        fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+    } else {
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'update.html'), (err, template) => {
             if (err)
                 throw err;
-            let accueil = template.toString().replace('<header>%</header>', header.toString());
-            modelEvenement.getByPromotion(req.params.id)
-                .then((data) => {
-                    modelEvenement.getAllPromotionAvailable()
-                        .then((listePromotion) => {
-                            let promo;
-                            let txt = "<option value = \"" + req.params.id + "\" selected>" + req.params.id +"</option> \n";
-                            for (let i = 0; i < listePromotion.length; i ++) {
-                                promo = listePromotion[i].annee;
+            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                if (err)
+                    throw err;
+                let accueil = template.toString().replace('<header>%</header>', header.toString());
+                modelEvenement.getByPromotion(req.params.id)
+                    .then((data) => {
+                        modelEvenement.getAllPromotionAvailable()
+                            .then((listePromotion) => {
+                                let promo;
+                                let txt = "<option value = \"" + req.params.id + "\" selected>" + req.params.id +"</option> \n";
+                                for (let i = 0; i < listePromotion.length; i ++) {
+                                    promo = listePromotion[i].annee;
 
                                     txt += "<option value = \"" + promo + "\">" + promo +"</option>"
-                                txt += "\n";
-                            }
-                            accueil = accueil.toString().replace("%option%", txt);
-                            accueil = miseAJourPage(accueil, data[0], req.params.id);
-                            res.end(accueil);
-                        })
-                })
-                .catch((err) => {
-                    throw err; //Pour le moment on stoppe tout et on génère une erreur
-                })
+                                    txt += "\n";
+                                }
+                                accueil = accueil.toString().replace("%option%", txt);
+                                accueil = miseAJourPage(accueil, data[0], req.params.id);
+                                res.end(accueil);
+                            })
+                    })
+                    .catch((err) => {
+                        throw err; //Pour le moment on stoppe tout et on génère une erreur
+                    })
+            });
         });
-    });
+    }
 });
 
 router.all('/updated', (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
+    } else {
+        let id = recupParam(req, "id");
+        let nomEvent = recupParam(req, "nomEvent");
+        let dateDebut = recupParam(req, "dateDebut");
+        let Duree = recupParam(req, "Duree");
+        let dateLimiteResa = recupParam(req, "dateLimiteResa");
+        let dureeCreneau = recupParam(req, "dureeCreneau");
+        let nombreMembresJury = recupParam(req, "nombreMembresJury");
+        let anneePromo = recupParam(req, "anneePromo");
+        modelEvenement.update([nomEvent, dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo, id])
+            .then((retour) => {
+                console.log(retour);
+                res.writeHead(302, {'Location': '/admin/evenement/read/' + anneePromo}); //On le redirige vers la vue de cet évenement
+                res.end();
+            })
+            .catch(
+                function () {
+                    console.log("Une erreur est survenue dans la fonction");
+                    res.end("ssaussure");
+                }
+            );
     }
-    let id = recupParam(req, "id");
-    let nomEvent = recupParam(req, "nomEvent");
-    let dateDebut = recupParam(req, "dateDebut");
-    let Duree = recupParam(req, "Duree");
-    let dateLimiteResa = recupParam(req, "dateLimiteResa");
-    let dureeCreneau = recupParam(req, "dureeCreneau");
-    let nombreMembresJury = recupParam(req, "nombreMembresJury");
-    let anneePromo = recupParam(req, "anneePromo");
-    modelEvenement.update([nomEvent, dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo, id])
-        .then((retour) => {
-            console.log(retour);
-            res.writeHead(302, {'Location': '/admin/evenement/read/' + anneePromo}); //On le redirige vers la vue de cet évenement
-            res.end();
-        })
-        .catch(
-            function () {
-                console.log("Une erreur est survenue dans la fonction");
-                res.end("ssaussure");
-            }
-        );
 });
 
 router.all("/delete/:id", (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
         res.end("Tu n'as rien à faire là");
+    } else {
+        const modelCreneaux = require(path.join(__dirname, '..', 'model', 'creneaux'));
+        const modelParticipe = require(path.join(__dirname, '..', 'model', 'participe'));
+        const modelgroupeProjet = require(path.join(__dirname, '..', 'model', 'groupeProjet'));
+        const modelComposer = require(path.join(__dirname, '..', 'model', 'composer'));
+        modelParticipe.truncate()
+            .then((pa) => {
+                console.log("Participe : " + pa)
+                modelCreneaux.truncate()
+                    .then((ev) => {
+                        console.log("Creneaux : " + ev)
+                        modelEvenement.truncate()
+                            .then((cr) => {
+                                console.log("Evenement : " + cr)
+                                //TODO ?
+                            })
+                            .catch((err) => {
+                                console.log("Une erreur dans le truncate des événements");
+                                res.end(err);
+                            })
+                    })
+                    .catch((err) => {
+                        console.log("Une erreur dans le truncate des créneaux");
+                        res.end(err);
+                    });
+            })
+            .catch((err) => {
+                console.log("Une erreur dans le truncate de participe (Créneaux / Prof)");
+                res.end(err);
+            })
+        modelComposer.truncate()
+            .then((com) => {
+                console.log("Composer : " + com)
+                modelgroupeProjet.truncate()
+                    .then((pr) => {
+                        console.log("Groupe Projet : " + pr)
+                        //TODO ?
+                    })
+                    .catch((err) => {
+                        console.log("Une erreur dans le truncate des groupeprojet");
+                        res.end(err);
+                    })
+            })
+            .catch((err) => {
+                console.log("Une erreur dans le truncate des Composer (Etudiants / groupeprojet)");
+                res.end(err);
+            })
+        res.end("événement supprimé");
     }
-    const modelCreneaux = require(path.join(__dirname, '..', 'model', 'creneaux'));
-    const modelParticipe = require(path.join(__dirname, '..', 'model', 'participe'));
-    const modelgroupeProjet = require(path.join(__dirname, '..', 'model', 'groupeProjet'));
-    const modelComposer = require(path.join(__dirname, '..', 'model', 'composer'));
-    modelParticipe.truncate()
-        .then((pa) => {
-            console.log("Participe : " + pa)
-            modelCreneaux.truncate()
-                .then((ev) => {
-                    console.log("Creneaux : " + ev)
-                    modelEvenement.truncate()
-                        .then((cr) => {
-                            console.log("Evenement : " + cr)
-                            //TODO ?
-                        })
-                        .catch((err) => {
-                            console.log("Une erreur dans le truncate des événements");
-                            res.end(err);
-                        })
-                })
-                .catch((err) => {
-                    console.log("Une erreur dans le truncate des créneaux");
-                    res.end(err);
-                });
-        })
-        .catch((err) => {
-            console.log("Une erreur dans le truncate de participe (Créneaux / Prof)");
-            res.end(err);
-        })
-    modelComposer.truncate()
-        .then((com) => {
-            console.log("Composer : " + com)
-            modelgroupeProjet.truncate()
-                .then((pr) => {
-                    console.log("Groupe Projet : " + pr)
-                    //TODO ?
-                })
-                .catch((err) => {
-                    console.log("Une erreur dans le truncate des groupeprojet");
-                    res.end(err);
-                })
-        })
-        .catch((err) => {
-            console.log("Une erreur dans le truncate des Composer (Etudiants / groupeprojet)");
-            res.end(err);
-        })
-    res.end("événement supprimé");
 });
 
 module.exports = router;
