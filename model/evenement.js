@@ -78,10 +78,12 @@ function getAllPromotionAvailable () {
     });
 }
 
-function truncate () {
+function clearByEvent (idEvenement) {
     return new Promise(((resolve, reject) => {
-        let sql = "DELETE FROM `evenements`;";
-        db.query(sql, (err, result) => {
+        let sql = "DELETE " +
+            "FROM `evenements` " +
+            "WHERE anneePromo = ?;";
+        db.query(sql, [idEvenement], (err, result) => {
             if (err)
                 reject(err);
             else
@@ -90,4 +92,4 @@ function truncate () {
     }));
 }
 
-module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, truncate};
+module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent};

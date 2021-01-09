@@ -230,16 +230,26 @@ router.all("/delete/:id", (req, res, next) => {
         const modelParticipe = require(path.join(__dirname, '..', 'model', 'participe'));
         const modelgroupeProjet = require(path.join(__dirname, '..', 'model', 'groupeProjet'));
         const modelComposer = require(path.join(__dirname, '..', 'model', 'composer'));
-        modelParticipe.truncate()
-            .then((pa) => {
+        modelParticipe.clearByEvent(req.params.id)
+            .then((pa) => { //Nettoyage de la table Participe
                 console.log("Participe : " + pa)
-                modelCreneaux.truncate()
-                    .then((ev) => {
+                modelCreneaux.clearByEvent(req.params.id)
+                    .then((ev) => { //Nettoyage de la table Creneaux
                         console.log("Creneaux : " + ev)
-                        modelEvenement.truncate()
-                            .then((cr) => {
+                        modelEvenement.clearByEvent(req.params.id)
+                            .then((cr) => { //Nettoyage de la table Evenement
                                 console.log("Evenement : " + cr)
-                                //TODO ?
+                                fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'supprime.html'), (err, template) => {
+                                    if (err)
+                                        throw err;
+                                    fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                                        if (err)
+                                            throw err;
+                                        template = template.toString().replace('<header>%</header>', header.toString());
+                                        template = template.toString().replace(':id', req.params.id);
+                                        res.end(template);
+                                    })
+                                })
                             })
                             .catch((err) => {
                                 console.log("Une erreur dans le truncate des événements");
@@ -255,24 +265,23 @@ router.all("/delete/:id", (req, res, next) => {
                 console.log("Une erreur dans le truncate de participe (Créneaux / Prof)");
                 res.end(err);
             })
-        modelComposer.truncate()
-            .then((com) => {
-                console.log("Composer : " + com)
-                modelgroupeProjet.truncate()
-                    .then((pr) => {
-                        console.log("Groupe Projet : " + pr)
-                        //TODO ?
-                    })
-                    .catch((err) => {
-                        console.log("Une erreur dans le truncate des groupeprojet");
-                        res.end(err);
-                    })
-            })
-            .catch((err) => {
-                console.log("Une erreur dans le truncate des Composer (Etudiants / groupeprojet)");
-                res.end(err);
-            })
-        res.end("événement supprimé");
+        // modelComposer.clearByEvent(req.params.id)
+        //     .then((com) => {
+        //         console.log("Composer : " + com)
+        //         modelgroupeProjet.truncate()
+        //             .then((pr) => {
+        //                 console.log("Groupe Projet : " + pr)
+        //                 //TODO ?
+        //             })
+        //             .catch((err) => {
+        //                 console.log("Une erreur dans le truncate des groupeprojet");
+        //                 res.end(err);
+        //             })
+        //     })
+        //     .catch((err) => {
+        //         console.log("Une erreur dans le truncate des Composer (Etudiants / groupeprojet)");
+        //         res.end(err);
+        //     })
     }
 });
 
