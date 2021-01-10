@@ -24,8 +24,7 @@ const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe vérouillé
 
 router.get('/', (req, res, next) => { //Page d'accueil utilisateur
-    let rang_utilisateur = auth(req, res, next);
-    if (rang_utilisateur !== 0) { //Si ce n'est pas étudiant, on le redirige vers la page / qui gère les redirection en fonction de son rang
+    if (auth(req, res, next) !== 0) { //Si ce n'est pas étudiant, on le redirige vers la page / qui gère les redirection en fonction de son rang
         res.writeHead(302, {'Location': '/'});
         res.end();
     } else {
@@ -149,6 +148,10 @@ router.post('/modifier',(req,res,)=>{
 
 //S'occupe de la réservation d'un créneau pour un étudiant
 router.get('/reservation/:id', function(req, res, next) {
+    if (auth(req, res, next) !== 0) { //Si ce n'est pas étudiant, on le redirige vers la page / qui gère les redirection en fonction de son rang
+        res.writeHead(302, {'Location': '/'});
+        res.end();
+    }
     let token = req.cookies['token'];
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     modelEtudiant.getGrpId(decodedToken["numeroEt"]).then((result)=>{
