@@ -87,9 +87,12 @@ router.all('/created', (req, res, next) => {
                         res.end();
                     })
                     .catch(
-                        function () {
-                            console.log("Une erreur est survenue dans la fonction");
-                            res.end("ssaussure");
+                        function (err) {
+                            console.log(err);
+                            fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', "");
+                                res.end(content);
+                            });
                         }
                     );
             }
@@ -110,7 +113,9 @@ router.all('/read/:id', (req, res, next) => { //Afficher le détail de l'évenem
         fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'detail.html'), (err, template) => {
             if (err)
                 throw err;
-            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (error, header) => {
+                if (error)
+                    throw error;
                 let accueil = template.toString().replace('<header>%</header>', header.toString());
                 modelEvenement.getByPromotion(req.params.id)
                     .then((data) => {
@@ -127,8 +132,12 @@ router.all('/read/:id', (req, res, next) => { //Afficher le détail de l'évenem
                             });
                         }
                     })
-                    .catch((err) => {
-                        throw err; //Pour le moment on stoppe tout et on génère une erreur
+                    .catch((err) => { //erreur de communication avec la BDD *
+                        console.log(err);
+                        fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                            content = content.toString().replace('<header>%</header>', header.toString());
+                            res.end(content);
+                        });
                     })
             });
         });
@@ -175,7 +184,11 @@ router.all('/list', (req, res, next) => {
                         }
                     })
                     .catch((err) => {
-                        res.end(err);
+                        console.log(err);
+                        fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                            content = content.toString().replace('<header>%</header>', header.toString());
+                            res.end(content);
+                        });
                     })
             });
         })
@@ -230,7 +243,10 @@ router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'éven
                     })
                     .catch((err) => {
                         console.log(err);
-                        throw err; //Pour le moment on stoppe tout et on génère une erreur
+                        fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                            content = content.toString().replace('<header>%</header>', header.toString());
+                            res.end(content);
+                        });
                     })
             });
         });
@@ -261,9 +277,12 @@ router.all('/updated', (req, res, next) => {
                 res.end();
             })
             .catch(
-                function () {
-                    console.log("Une erreur est survenue dans la fonction");
-                    res.end("ssaussure");
+                function (err) {
+                    console.log(err);
+                    fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                        content = content.toString().replace('<header>%</header>', "");
+                        res.end(content);
+                    });
                 }
             );
     }
@@ -304,18 +323,27 @@ router.all("/delete/:id", (req, res, next) => {
                                 })
                             })
                             .catch((err) => {
-                                console.log("Une erreur dans le truncate des événements");
-                                res.end(err);
+                                console.log(err);
+                                fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                                    content = content.toString().replace('<header>%</header>', "");
+                                    res.end(content);
+                                });
                             })
                     })
                     .catch((err) => {
-                        console.log("Une erreur dans le truncate des créneaux");
-                        res.end(err);
+                        console.log(err);
+                        fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                            content = content.toString().replace('<header>%</header>', "");
+                            res.end(content);
+                        });
                     });
             })
             .catch((err) => {
-                console.log("Une erreur dans le truncate de participe (Créneaux / Prof)");
-                res.end(err);
+                console.log(err);
+                fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                    content = content.toString().replace('<header>%</header>', "");
+                    res.end(content);
+                });
             })
         // modelComposer.clearByEvent(req.params.id)
         //     .then((com) => {
