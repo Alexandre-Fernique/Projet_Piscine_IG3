@@ -14,7 +14,12 @@ var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe v
 
 router.get('/', (req, res, next) => {
     if (auth(req, res, next) !== 1) {
-        res.end("T'as rien à faire là ");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         //Page d'accueil administrateur
         fs.readFile(path.join(__dirname, "view/Admin/index.html"), (err, template) => {
@@ -32,7 +37,12 @@ router.get('/', (req, res, next) => {
 
 router.get('/evenement', (req, res, next) => { // On délègue la gestion des évenements à un routeur à part
     if (auth(req, res, next) !== 1) {
-        res.end("T'as rien à faire là ");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         res.writeHead(302, {'Location': '/admin/evenement/list'});
         res.status(200).end();

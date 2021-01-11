@@ -34,7 +34,12 @@ function miseAJourPage (template, donnee, id) {
 
 router.all('/create', (req, res, next) => { //Création de l'évenement
     if (auth(req, res, next) !== 1) {
-        res.end("T'as rien à faire là ");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         console.log("OK");
         fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'creationEvenement.html'), (err, template) => {
@@ -50,7 +55,12 @@ router.all('/create', (req, res, next) => { //Création de l'évenement
 
 router.all('/created', (req, res, next) => {
     if (auth(req, res, next) !== 1) {
-        res.end("T'as rien à faire là ");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         let nomEvent = recupParam(req, "nomEvent");
         let dateDebut = recupParam(req, "dateDebut");
@@ -90,7 +100,12 @@ router.all('/created', (req, res, next) => {
 
 router.all('/read/:id', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
-        res.end("T'as rien à faire là ");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'detail.html'), (err, template) => {
             if (err)
@@ -105,7 +120,9 @@ router.all('/read/:id', (req, res, next) => { //Afficher le détail de l'évenem
                             res.end(accueil);
                         }
                         else { //Notre événement n'existe pas
-                            fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenement.html'), (err, content) => {
+                            fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenementId.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', header.toString());
+                                content = content.toString().replace(':id', req.params.id);
                                 res.end(content);
                             });
                         }
@@ -120,7 +137,12 @@ router.all('/read/:id', (req, res, next) => { //Afficher le détail de l'évenem
 
 router.all('/list', (req, res, next) => {
     if (auth(req, res, next) !== 1) {
-        res.end("T'as rien à faire là ");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'list.html'), (err, template) => {
             if (err)
@@ -147,6 +169,7 @@ router.all('/list', (req, res, next) => {
                         }
                         else {
                             fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenement.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', header.toString());
                                 res.end(content);
                             });
                         }
@@ -161,7 +184,12 @@ router.all('/list', (req, res, next) => {
 
 router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
-        res.end("Tu n'as rien à faire là");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'update.html'), (err, template) => {
             if (err)
@@ -172,22 +200,36 @@ router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'éven
                 let accueil = template.toString().replace('<header>%</header>', header.toString());
                 modelEvenement.getByPromotion(req.params.id)
                     .then((data) => {
-                        modelEvenement.getAllPromotionAvailable()
-                            .then((listePromotion) => {
-                                let promo;
-                                let txt = "<option value = \"" + req.params.id + "\" selected>" + req.params.id +"</option> \n";
-                                for (let i = 0; i < listePromotion.length; i ++) {
-                                    promo = listePromotion[i].annee;
+                        if (data.length > 0) {
+                            modelEvenement.getAllPromotionAvailable()
+                                .then((listePromotion) => {
 
-                                    txt += "<option value = \"" + promo + "\">" + promo +"</option>"
-                                    txt += "\n";
-                                }
-                                accueil = accueil.toString().replace("%option%", txt);
-                                accueil = miseAJourPage(accueil, data[0], req.params.id);
-                                res.end(accueil);
-                            })
+                                    let promo;
+                                    let txt = "<option value = \"" + req.params.id + "\" selected>" + req.params.id +"</option> \n";
+                                    for (let i = 0; i < listePromotion.length; i ++) {
+                                        promo = listePromotion[i].annee;
+
+                                        txt += "<option value = \"" + promo + "\">" + promo +"</option>"
+                                        txt += "\n";
+                                    }
+                                    accueil = accueil.toString().replace("%option%", txt);
+                                    accueil = miseAJourPage(accueil, data[0], req.params.id);
+                                    res.end(accueil);
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                    throw err;
+                                })
+                        } else {
+                            fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'pasEvenementId.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', header.toString());
+                                content = content.toString().replace(':id', req.params.id);
+                                res.end(content);
+                            });
+                        }
                     })
                     .catch((err) => {
+                        console.log(err);
                         throw err; //Pour le moment on stoppe tout et on génère une erreur
                     })
             });
@@ -197,7 +239,12 @@ router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'éven
 
 router.all('/updated', (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
-        res.end("Tu n'as rien à faire là");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         let id = recupParam(req, "id");
         let nomEvent = recupParam(req, "nomEvent");
@@ -224,7 +271,12 @@ router.all('/updated', (req, res, next) => {
 
 router.all("/delete/:id", (req, res, next) => {
     if (auth(req, res, next) !== 1) { //On test si la personne qui tente de rentrer est un administrateur
-        res.end("Tu n'as rien à faire là");
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
     } else {
         const modelCreneaux = require(path.join(__dirname, '..', 'model', 'creneaux'));
         const modelParticipe = require(path.join(__dirname, '..', 'model', 'participe'));
