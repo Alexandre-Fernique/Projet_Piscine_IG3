@@ -51,6 +51,7 @@ router.get('/inscrit', function(req, res, next) {
                 if(promo['annee']!="Admin")
                     text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
             }
+            console.log(text);
             res.end(template.toString().replace('< option/>',text));
 
         })
