@@ -163,7 +163,7 @@ router.all('/list', (req, res, next) => {
                         if (data.length > 0) { //On a pu trouver un événement dans notre base de donnée
                             let tmp, resultat = "";
                             for (let i = 0; i < data.length; i++) {
-                                tmp = '<div class="col-md-4 card" style="width: 18rem;">' +
+                                tmp = '<div class="col-md-4 card" style="width: 30rem;">' +
                                             '<div class="card-body">' +
                                                 '<h5 class="card-title">' + data[i].nom + '</h5>' +
                                                 '<h6 class="card-subtitle mb-2 text-muted">' + data[i].anneePromo +'</h6>' +
