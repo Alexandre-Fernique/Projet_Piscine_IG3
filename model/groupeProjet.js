@@ -10,7 +10,7 @@ function create (values) {
                 reject(err);
             }
             else{
-                let id = "SELECT MAX(id) FROM groupeprojet"
+                let id = "SELECT MAX(id) as id FROM groupeprojet;"
                 db.query(id,(err,result)=>{
                     if (err) {
                         console.log(err);
