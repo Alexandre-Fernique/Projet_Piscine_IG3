@@ -3,13 +3,13 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const db = require(path.join(__dirname, '..', 'bin', 'bdd'));
-const auth = require (path.join(__dirname, '../bin/auth'));
+const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
-const modelEtudiant = require(path.join(__dirname, '../model/etudiant'));
-const modelGroup = require(path.join(__dirname,'../model/groupeprojet'));
-const modelProf = require(path.join(__dirname,'../model/professeur'));
-const modelComposer = require(path.join(__dirname,'../model/composer'));
+const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
+const modelGroup = require(path.join(__dirname,'..', 'model', 'groupeprojet'));
+const modelProf = require(path.join(__dirname,'..', 'model', 'professeur'));
+const modelComposer = require(path.join(__dirname,'..', 'model', 'composer'));
 
 router.all('/', (req, res, next) => { //Page d'accueil utilisateur
     let rang_utilisateur = auth(req, res, next);
@@ -42,9 +42,12 @@ router.all('/', (req, res, next) => { //Page d'accueil utilisateur
                             res.end(groupe.toString().replace('<etudiant></etudiant>', text+"`</script>"));
                         });
                     });
-                }).catch(() => {
-                    console.log("Problème");
-                    res.end("On a un problème"); // Faire une page d'erreur
+                }).catch((err) => {
+                    console.log(err);
+                    fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                        content = content.toString().replace('<header>%</header>', "");
+                        res.end(content);
+                    });
                 });
             });
         });
@@ -76,9 +79,6 @@ router.all("/created", (req, res, next) => {
                 .then((values) => { // Pour la création, on lui passe un tableau qui contient toutes les valeurs et pas toutes les valeurs une par une
                     let token = req.cookies['token'];
                     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-
-                    console.log("on passe par là");
-                    
                     listEtudiant.push(decodedToken["numeroEt"]); //Cette fonction retourne ce qu'on vient d'insrérer, il faut fonc le faire avant
                     let idGroupe = values[0].id;
                     modelComposer.create(idGroupe, listEtudiant)
@@ -90,12 +90,18 @@ router.all("/created", (req, res, next) => {
                         })
                         .catch(function (){
                             console.log("liaison etudiants groupe");
-                            res.end("ETUDIANTS GROUPE")
+                            fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', "");
+                                res.end(content);
+                            });
                         });
                 })
                 .catch(function () {
                     console.log("création groupe");
-                    res.end("");
+                    fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                        content = content.toString().replace('<header>%</header>', "");
+                        res.end(content);
+                    });
             });
         })
         .catch((errProf) => {
@@ -106,18 +112,6 @@ router.all("/created", (req, res, next) => {
             });
         });
 });
-
-router.all("/test", (req, res, next) => {
-    modelProf.getProfId("Villaret", "Anne-laure")
-        .then((values) => {
-            console.log(values)
-            res.end("ok")
-        })
-        .catch((err) => {
-            console.log(err)
-            res.end("ko")
-        })
-})
 
 
 module.exports = router;
