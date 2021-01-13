@@ -11,7 +11,7 @@ const mysql = require('mysql');
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Wood1283",
+    password: "",
     database: "projet_piscine",
     timezone: 'utc'
 });

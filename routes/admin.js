@@ -5,7 +5,7 @@ const path = require('path');
 const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 const htmlspecialchars = require('htmlspecialchars');
-const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
+const modelAdmin = require(path.join(__dirname, '..', 'model', 'admin'));
 const passwordHash = require('password-hash'); // Permet le hashage du mot de passe
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
@@ -29,7 +29,27 @@ router.get('/', (req, res, next) => {
                 let accueil = template.toString().replace('<header>%</header>', header.toString());
                 if (err)
                     throw err;
-                res.end(accueil.toString());
+                modelAdmin.get("prenom").then((requete) => {
+                    //On ajoute Bonjour, <Prénom> dans l'entête
+                    let headerPerso = header.toString().replace('%NOM%', htmlspecialchars(requete[0].prenom));
+                    //On ajoute l'entête dans notre page
+                    let accueil = template.toString().replace('<header>%</header>', headerPerso);
+                    modelAdmin.getEvent().then((listEvent) => {
+                        modelAdmin.getProfEvent().then((profEvent) => {
+                            //convertit en JSON le resultat des requetes SQL et les envois coté front
+                            let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>"
+                            //console.log(donne);
+                            res.end(accueil.replace('<lesevents></lesevents>', donne))
+                            //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+                        }).catch(() => {
+                            console.log("Problème Prof event")
+                        })
+                    }).catch(() => {
+                        console.log("Problème event ou groupe");
+                        //Si l'admin n'a pas de groupe ou erreur dans la requête SQL des events
+                    })
+                })
+                //res.end(accueil.toString());
             })
         });
     }
@@ -59,7 +79,6 @@ router.get('/modifierMDP',(req,res,next)=>{
         fs.readFile(path.join(__dirname, 'view','Admin', 'header.html'), (err, header) => {
             if (err)
                 throw err;
-
             let token = req.cookies['token'];
             const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
             modelEtudiant.get("prenom,anneePromo", decodedToken["numeroEt"]).then((requete) => {

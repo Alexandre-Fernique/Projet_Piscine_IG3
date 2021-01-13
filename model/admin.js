@@ -13,9 +13,9 @@ Cette fonction est un getteur générique
 column est le nom de la colonne qu'il faut vérifier
 num est le numéro de l'admin (La clé primaire de la table)
  */
-function get (column, id) {
+function get (column) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT " + column + " FROM `etudiants` WHERE numero=" + id + ";";
+        let sql = "SELECT " + column + " FROM `etudiants` WHERE numero=" + -1 + ";";
         db.query(sql, (err, result) => {
             if (err) {
                 console.log(err);
@@ -64,7 +64,7 @@ function getEvent(prof=false){
                     console.log(err);
                     reject(err);
                 } else {
-                    console.log(result);
+                    //console.log(result);
                     resolve(result);
                 }
             });
@@ -78,11 +78,26 @@ function getEvent(prof=false){
                     console.log(err);
                     reject(err);
                 } else {
-                    console.log(result);
+                    //console.log(result);
                     resolve(result);
                 }
             });
         }
     });
 }
-module.exports = {get,getEvent,changeEvenements };
+
+//function getteur pour avoir les nom des prof associé au créneaux d'une promo
+function getProfEvent(){
+    return new Promise(((resolve, reject) => {
+        let sql = "SELECT `creneaux`.`id`, `professeurs`.`nom`,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id ;"
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    }))
+}
+
+module.exports = {get,getEvent,changeEvenements,getProfEvent };
