@@ -4,15 +4,24 @@ const db = require(path.join(__dirname, '../bin/bdd'));
 function createCreneau (values) {
     return new Promise((resolve, reject) => {
         let sql = "INSERT INTO `creneaux` (`date`, `heureDebut`, `idEvenement`) VALUES (?, ?, ?);";
-        db.query(sql, values, (err, result) => {
+        db.query(sql, values, (err) => {
             if (err) {
                 console.log(err);
                 reject(err);
             }
-            else
-                resolve(result);
         });
     });
+}
+function getIdLastCreate(){
+    return new Promise(((resolve, reject) => {
+        db.query("SELECT MAX(id) AS id from creneaux;",(err,result)=>{
+            console.log(result)
+            if (err)
+                reject(err)
+
+            resolve(result)
+        })
+    }))
 }
 
 function modifier (values) {
@@ -30,10 +39,10 @@ function modifier (values) {
 }
 
 
-function getEvent (idEvent) {
+function getEvent (anne) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT `nom` FROM `evenements` WHERE anneePromo=? ";
-        db.query(sql, idEvent,(err, result) => {
+        let sql = "SELECT `id`,`nom` FROM `evenements` WHERE anneePromo=? ";
+        db.query(sql, anne,(err, result) => {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -114,4 +123,4 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent}
+module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent,getIdLastCreate}

@@ -226,9 +226,9 @@ router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour
                     modelEtudiant.getProfEvent(req.params.id).then((profEvent) => {
                         console.log(req.params.id)
                         modelCreneau.getEvent(req.params.id).then((nomEvent)=> {
-                            modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau)=> {                            
+                            modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau)=> {
+                                console.log(nomEvent)
                                 let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + ";let dureeCreneau=" + JSON.stringify(dureeCreneau) + ";let eventID=" + JSON.stringify(nomEvent[0].id) + "</script>" //ajouter dureeCreneau : slotDuration
-                                console.log(nomEvent[0].nom)
 
                                 res.end(accueil.replace('<event></event>', donne).replace("%NOMEVENT%",htmlspecialchars(nomEvent[0].nom)))
                                 //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
@@ -280,6 +280,16 @@ router.post('/createCreneau', (req, res, next) => { //Creer un creneau pour un e
             );
     }
 });
+router.get("/idcreneau",((req, res) => {
+    modelCreneau.getIdLastCreate().then((id)=>{
+        console.log(id[0].id)
+        res.end(JSON.stringify(id[0].id))
+    }).catch(()=>{
+        console.log("problème")
+        res.end("Problème")
+    })
+}));
+
 router.post('/modifier', (req, res, next) => { //Ajouter u crenau à un evenement
     if (auth(req, res, next) !== 1) {
         fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
@@ -292,7 +302,7 @@ router.post('/modifier', (req, res, next) => { //Ajouter u crenau à un evenemen
         //"INSERT INTO `creneaux` (`date`, `heureDebut`, `salle`, `idEvenement`, `idGroupeProjet`)
         let id = recupParam(req, "id");
         let date = recupParam(req, "date");
-        let heureDebut = recupParam(req, "heureDebut").split("+")[0];
+        let heureDebut = recupParam(req, "heureDebut").split(" ")[0];
         console.log(heureDebut);
         modelCreneau.modifier([date, heureDebut, id])
             .then((retour) => {

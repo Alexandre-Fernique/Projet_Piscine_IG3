@@ -20,6 +20,8 @@ let liste = []
 for (let event of tampon) {
     let data ={};
     let prof ="";
+    let couleur="";
+    let statue="";
     for (let i of ProfEvent)
     {
         if(i.id===event.id)
@@ -27,28 +29,31 @@ for (let event of tampon) {
     }
     if(prof!=="")
         prof="Jury: "+prof.substring(0,prof.length-2);
+
+    if(event.anneePromo=="IG3")
+        couleur="#92e53f";
+    else if (event.anneePromo=="IG4")
+        couleur="#e5923f";
+    else
+        couleur="#c60075";
+    if(event.idGroupeProjet==null)
+        statue=" Non Réservé ";
+    else
+        statue=" Réservé ";
+
     //Si le créneau a été réservé par un groupe
-    if(event.idGroupeProjet==null){
-        data = {
-            id: event.id,
-            title: event.salle+" Non Réservé "+prof,
-            color:"#c60075",
-            start: event.date.split("T")[0] + "T" + event.heureDebut,
-            end: event.date.split("T")[0] + "T" +addTime(event.heureDebut,event.dureeCreneau),
-            classNames:"event-display",
-        };
-    }
-    //Si le créneau n'a pas été réservé par un groupe
-    else if(event.idGroupeProjet!=null) {
-        data = {
-            id: event.id,
-            title: event.salle + " Réservé " + prof,
-            color: "#343a40",
-            start: event.date.split("T")[0] + "T" + event.heureDebut,
-            end: event.date.split("T")[0] + "T" +addTime(event.heureDebut,event.dureeCreneau),
-            classNames: "event-display",
-        };
-    }
+
+    data = {
+        id: event.id,
+        title: ""+event.salle+statue+prof,
+        color:couleur,
+        start: event.date.split("T")[0] + "T" + event.heureDebut,
+        end: event.date.split("T")[0] + "T" +addTime(event.heureDebut,event.dureeCreneau),
+        classNames:"event-display",
+    };
+
+
+
     liste.push(data);
 }
 

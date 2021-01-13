@@ -8,6 +8,7 @@ const htmlspecialchars = require('htmlspecialchars');
 const modelAdmin = require(path.join(__dirname, '..', 'model', 'admin'));
 const passwordHash = require('password-hash'); // Permet le hashage du mot de passe
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
+const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
 var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe vérouillé

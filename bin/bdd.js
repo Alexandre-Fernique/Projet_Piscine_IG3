@@ -8,12 +8,12 @@ const mysql = require('mysql');
  * Création d'une instance pour communiquer avec la base de données
  */
 
-var db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "projet_piscine",
-    timezone: 'utc'
+let db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    timezone: process.env.DB_TIMEZONE,
 });
 
 db.connect(function(err) {
