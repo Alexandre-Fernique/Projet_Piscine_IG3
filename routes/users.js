@@ -11,6 +11,7 @@ const htmlspecialchars = require('htmlspecialchars');
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
 const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
+const modelEvenement = require(path.join(__dirname, '..', 'model', 'evenement'));
 
 /* GET users listing. */
 
@@ -46,21 +47,29 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
                     //console.log(template.toString());
                     //requete SQL des créneaux en fonction de la promo
                     modelEtudiant.getGrpId(decodedToken["numeroEt"]).then((IdProjet) => {
-                        modelEtudiant.getEvent(requete[0].anneePromo).then((listEvent) => {
-                            modelEtudiant.getProfEvent(requete[0].anneePromo).then((profEvent) => {
-                                //convertit en JSON le resultat des requetes SQL et les envois coté front
-                                let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let IdProjet=" + JSON.stringify(IdProjet) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>"
-                                res.end(accueil.replace('<lesevents></lesevents>', donne))
-                                //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+                        try {
+                            if (IdProjet[0] === undefined)
+                                throw "Error"
+                            modelEtudiant.getEvent(requete[0].anneePromo).then((listEvent) => {
+                                modelEtudiant.getProfEvent(requete[0].anneePromo).then((profEvent) => {
+                                    //convertit en JSON le resultat des requetes SQL et les envois coté front
+                                    let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let IdProjet=" + JSON.stringify(IdProjet) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>"
+                                    res.end(accueil.replace('<lesevents></lesevents>', donne))
+                                    //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
 
+                                }).catch(() => {
+                                    console.log("Problème Prof event")
+                                })
                             }).catch(() => {
-                                console.log("Problème Prof event")
+                                console.log("Problème event ou groupe");
+                                //Si l'étudiant n'a pas de groupe ou erreur dans la requête SQL des events
                             })
-                        }).catch(() => {
-                            console.log("Problème event ou groupe");
-                            //Si l'étudiant n'a pas de groupe ou erreur dans la requête SQL des events
-                            res.end(accueil.replace("<div id='calendar'></div>", '<h1>Veuillez créer un groupe</h1>').replace('href="/creerGroupe"', 'href="/creerGroupe" style="color:red;animation: blink 2s infinite;"'));
-                        })
+                        }
+                        catch (err){
+                            console.log(err)
+                            res.end(accueil.replace("<div id='calendar'></div>", '<h1>Veuillez créer un groupe</h1>').replace('href="/creerGroupe"', 'href="/creerGroupe" style="color:red;animation: blink 2s infinite;"').replace('<script src="script.js"></script>',""));
+
+                        }
                     }).catch(() => {
                         console.log("Problème get Idprojet");
                     })
@@ -73,9 +82,6 @@ router.get('/', (req, res, next) => { //Page d'accueil utilisateur
     }
 });
 
-router.get('/list', function(req, res, next) {
-    res.status(200).sendFile(path.join(__dirname, 'view', 'users.html'));
-});
 
 router.get('/modifierMDP',(req,res,next)=>{
     let rang_utilisateur = auth(req, res, next);
@@ -132,13 +138,25 @@ router.get('/reservation/:id', function(req, res, next) {
     else {
         let token = req.cookies['token'];
         const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-        modelEtudiant.getGrpId(decodedToken["numeroEt"]).then((result) => {
-            modelEtudiant.get("anneePromo",decodedToken["numeroEt"]).then((annee)=>{
-                modelEtudiant.changeCreneaux(req.params.id, result[0].idGroupe,annee[0].anneePromo).catch(() => {
-                    res.end("problème");
-                })
-            })
+        modelEtudiant.get("anneePromo",decodedToken["numeroEt"]).then((annee)=>{
+            modelEvenement.getDateFinResa(annee[0].anneePromo).then((date)=> {
+                try {
+                    if (Date.now() - new Date(date[0].dateLimiteResa) > 0)
+                        throw "Fin des résa"
+                    modelEtudiant.getGrpId(decodedToken["numeroEt"]).then((result) => {
+                        modelEtudiant.changeCreneaux(req.params.id, result[0].idGroupe, annee[0].anneePromo).catch(() => {
+                            res.end("problème");
+                        })
+                    }).catch(() => {
+                    })
+                }catch (err){
+                    console.log(err)
+                    res.writeHead(302, {'Location': '/users'});
+                    res.status(200).end();
+            }
+            }).catch(()=>{
 
+            })
         }).catch(() => {
             res.end("problème");
         });

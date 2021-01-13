@@ -63,7 +63,19 @@ function getAll () {
         });
     });
 }
-
+function getDateFinResa(anne) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT dateLimiteResa FROM `evenements` WHERE anneePromo='"+anne+"';";
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    });
+}
 function getAllPromotionAvailable () {
     return new Promise((resolve, reject) => {
         let sql = "SELECT * FROM `promotion` promo WHERE promo.annee != 'Admin' AND promo.annee NOT IN ( SELECT e.anneePromo FROM evenements e)";
@@ -92,4 +104,16 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent};
+function getByPromo (toSelect, anneePromo) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT " + toSelect + "FROM `evenements` WHERE anneePromo=?;"
+        db.query(sql, [anneePromo], (err, result) => {
+            if (err)
+                reject(err);
+            else
+                resolve(result);
+        });
+    })
+}
+
+module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent, getByPromo};

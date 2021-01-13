@@ -177,13 +177,13 @@ COMMIT;
 
 -- creer les promos dans la DB
 INSERT INTO promotion VALUES ("IG3"),("IG4"),("IG5"),("Admin");
+-- insertion des professeur dans la DB
+INSERT INTO professeurs(nom,prenom) values ("Berry","Vincent"),("Bourdon","Isabelle"),("Buisson-Lopez","Lysiane"),("Castelltort","Arnaud"),("Chapellier","Philippe"),("Fiorio","Christophe"),("Guerrini","Eléonora"),("Laurent","Anne"),("Pacitti","Esther"),("Stratulat","Tibériu"),("Tibermacine","Chouki"),("Toulemonde","Gwladys"),("Villaret","Anne-Laure");
 -- création d'un evènment
 INSERT INTO `evenements` VALUES (1,"test","2020-11-30",15,"2020-11-30","01:00:00",3,"IG3");
 -- création de quelque créneaux
 INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-1","14:00:00","TD005",1);
 INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-2","15:00:00","TD005",1);
 INSERT INTO creneaux(date,heureDebut,salle,idEvenement) values ("2020-12-3","16:00:00","TD005",1);
-INSERT INTO professeurs(id,nom,prenom) values (1,"Alexa","leprof");
-INSERT INTO participe(idProfesseur,idCreneaux) values(1,1);
 -- création du compte admin avec mot de passe correspondant à 96706546secure hasher
 INSERT INTO `etudiants`(numero,nom,prenom,mail,motDePasse,anneePromo) values(-1,"admin","admin","mail@admin.fr","sha1$22f7aa80$1$26fdca0f74e49886ed59e04bb95ba975639f2fbc","Admin");
