@@ -9,6 +9,8 @@ const htmlspecialchars = require('htmlspecialchars');
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
 const modelEvenement = require(path.join(__dirname, '..', 'model', 'evenement'));
+const modelCreneau = require(path.join(__dirname, '..', 'model', 'creneaux'));
+const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
 
 
 function miseAJourPage (template, donnee, id) {
@@ -70,13 +72,13 @@ router.all('/created', (req, res, next) => {
         let nombreMembresJury = recupParam(req, "nombreMembresJury");
         let anneePromo = recupParam(req, "anneePromo");
 
-        let sql = "SELECT * FROM `evenements` WHERE nom='"+nomEvent+"' && anneePromo='"+anneePromo+"';";
+        let sql = "SELECT * FROM `evenements` WHERE anneePromo='"+anneePromo+"';";
         db.query(sql, (err, row) => {
             if (err) throw err;
             if (row && row.length ) {
                 console.log('Evenement existe déjà dans la base de données!');
                 let alert = require('alert');
-                alert("L'évenement "+ nomEvent +" concernant la promo "+ anneePromo +" existe déjà !")
+                alert("Un évenement concernant la promo "+ anneePromo +" est en cours!")
                 res.writeHead(302, {'Location': '/admin/evenement/create'});
                 res.end();
             } else {
@@ -181,6 +183,110 @@ router.all('/list', (req, res, next) => {
         })
     }
 })
+
+router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour l'ajout de crenau à un evenement
+    if (auth(req, res, next) !== 1) {
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
+    } else {
+        console.log("OK");
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'ajoutCreneau.html'), (err, template) => {
+            if (err)
+                throw err;
+            fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                if(err)
+                    throw err;
+
+                let accueil = template.toString().replace('<header>%</header>', header);
+
+                modelEtudiant.getEvent(req.params.id).then((listEvent) => {
+                    modelEtudiant.getProfEvent(req.params.id).then((profEvent) => {
+                        /*modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau) => {
+                            //convertit en JSON le resultat des requetes SQL et les envois coté front
+                            let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>" //ajouter dureeCreneau : slotDuration
+                            console.log(donne)
+                            res.end(accueil.replace('<event></event>', donne))
+                            //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+    
+                        }).catch(() => {
+                            console.log("Problème Duree Creneau")
+                        })*/
+                        //convertit en JSON le resultat des requetes SQL et les envois coté front
+                        let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>" //ajouter dureeCreneau : slotDuration
+                        console.log(donne)
+                        res.end(accueil.replace('<event></event>', donne))
+                        //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+                    }).catch(() => {
+                        console.log("Problème Prof event")
+                    })
+                }).catch(() => {
+                    console.log("Problème event ou groupe");
+                    //Si l'étudiant n'a pas de groupe ou erreur dans la requête SQL des events
+                    res.end("Erreur")
+                })
+                
+            });
+        });
+    }
+});
+
+router.post('/createCreneau', (req, res, next) => { //Creer un creneau pour un event
+    if (auth(req, res, next) !== 1) {
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
+    } else {
+        //"INSERT INTO `creneaux` (`date`, `heureDebut`, `salle`, `idEvenement`, `idGroupeProjet`)
+        let id = recupParam(req, "id");
+        let date = recupParam(req, "date");
+        let heureDebut = recupParam(req, "heureDebut");
+        console.log("Mon ID"+id)
+
+        modelCreneau.createCreneau([date, heureDebut, id])
+            .then((retour) => {
+                res.end("OK");
+            })
+            .catch(
+                function () {
+                    console.log("Une erreur est survenue dans la fonction");
+                    res.end("ERROR CREATION");
+                }
+            );
+    }
+});
+router.post('/modifier', (req, res, next) => { //Ajouter u crenau à un evenement
+    if (auth(req, res, next) !== 1) {
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
+    } else {
+        //"INSERT INTO `creneaux` (`date`, `heureDebut`, `salle`, `idEvenement`, `idGroupeProjet`)
+        let id = recupParam(req, "id");
+        let date = recupParam(req, "date");
+        let heureDebut = recupParam(req, "heureDebut");
+
+        modelEvenement.modifier([date, heureDebut, id])
+            .then((retour) => {
+               res.end("OK");
+            })
+            .catch(
+                function () {
+                    console.log("Une erreur est survenue dans la fonction");
+                    res.end("ERROR");
+                }
+            );
+    }
+});
 
 router.all('/update/:id', (req, res, next) => { //Afficher le détail de l'évenement
     if (auth(req, res, next) !== 1) {
