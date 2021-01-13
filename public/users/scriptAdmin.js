@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         itemSelector: '.fc-event',
         eventData: function(eventEl) {
           return {
-            duration : eventEl.dureeCreneau
+            duration : dureeCreneau
           };
         }
     });
@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         slotMaxTime:"22:00",
         weekends:false,
         dayMaxEvents:3,
+        editable:true,
         droppable: true,
         views:{
             timeGrid: {
@@ -82,16 +83,17 @@ document.addEventListener('DOMContentLoaded', function() {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,next',
         },
-        eventDrop : function(evenEdit) {
+        eventDrop : function(eventEdit) {
             var id = eventEdit.event.id;
-            var date = eventEdit.event.start.split("T")[0];
-            var heureDebut = eventEdit.event.start.split("T")[1];
+            var date = eventEdit.event.startStr.split("T")[0];
+            var heureDebut = eventEdit.event.startStr.split("T")[1];
             var request = new XMLHttpRequest();
             request.open("POST","/admin/evenement/modifier")
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 			//informations necessaires à date, heureDebut, salle, dureeCreneau, idEvenement ,idGroupeProjet
             let data ="id="+id+"&date="+date+"&heureDebut="+heureDebut ;
+            console.log(data);
             request.send(data);
             /*request.onload=()=>{
                 console.log(request.response);
@@ -107,7 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } ,
         drop : function(event) {
             //date_object
-            var id = 1 //demander à julien
+            let url = window.location.href.split("/");
+            let promo = url[url.length-1]; 
             var date = (1900+event.date.getYear())+"-"+event.date.getMonth()+1+"-"+event.date.getDate()
             var heureDebut = event.date.getHours()+":"+event.date.getMinutes()+":"+event.date.getSeconds()
             var request = new XMLHttpRequest();
@@ -115,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 			//informations necessaires date, heureDebut, salle, dureeCreneau, idEvenement ,idGroupeProjet
-            let data ="id="+id+"&date="+date+"&heureDebut="+heureDebut ;
+            let data ="id="+eventID+"&date="+date+"&heureDebut="+heureDebut ;
             request.send(data);
             request.onload=()=>{
                 console.log("MA reponse"+request.response);

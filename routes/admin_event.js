@@ -224,22 +224,12 @@ router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour
 
                 modelEtudiant.getEvent(req.params.id).then((listEvent) => {
                     modelEtudiant.getProfEvent(req.params.id).then((profEvent) => {
-                        /*modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau) => {
-                            //convertit en JSON le resultat des requetes SQL et les envois coté front
-                            let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>" //ajouter dureeCreneau : slotDuration
-                            console.log(donne)
-                            res.end(accueil.replace('<event></event>', donne))
-                            //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
-
-                        }).catch(() => {
-                            console.log("Problème Duree Creneau")
-                        })*/
-                        //convertit en JSON le resultat des requetes SQL et les envois coté front
                         console.log(req.params.id)
                         modelCreneau.getEvent(req.params.id).then((nomEvent)=> {
                             modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau)=> {                            
-                                let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + ";let dureeCreneau=" + JSON.stringify(dureeCreneau) + "</script>" //ajouter dureeCreneau : slotDuration
+                                let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + ";let dureeCreneau=" + JSON.stringify(dureeCreneau) + ";let eventID=" + JSON.stringify(nomEvent[0].id) + "</script>" //ajouter dureeCreneau : slotDuration
                                 console.log(nomEvent[0].nom)
+
                                 res.end(accueil.replace('<event></event>', donne).replace("%NOMEVENT%",htmlspecialchars(nomEvent[0].nom)))
                                 //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
                             }).catch(() => {
@@ -302,9 +292,9 @@ router.post('/modifier', (req, res, next) => { //Ajouter u crenau à un evenemen
         //"INSERT INTO `creneaux` (`date`, `heureDebut`, `salle`, `idEvenement`, `idGroupeProjet`)
         let id = recupParam(req, "id");
         let date = recupParam(req, "date");
-        let heureDebut = recupParam(req, "heureDebut");
-
-        modelEvenement.modifier([date, heureDebut, id])
+        let heureDebut = recupParam(req, "heureDebut").split("+")[0];
+        console.log(heureDebut);
+        modelCreneau.modifier([date, heureDebut, id])
             .then((retour) => {
                res.end("OK");
             })
