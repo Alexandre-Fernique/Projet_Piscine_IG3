@@ -28,10 +28,11 @@ for (let event of tampon) {
     let data ={};
     data = {
         id: event.id,
-        title: event.salle+prof,
+        title: event.salle+" "+event.prof,
         start: event.date.split("T")[0] + "T" + event.heureDebut,
         end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau)
     };
+    console.log("HEYYYYYYYYY"+event.prof);
     liste.push(data);
     console.log(liste);
 
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         itemSelector: '.fc-event',
         eventData: function(eventEl) {
           return {
-            //duration : duree
+            duration : eventEl.dureeCreneau
           };
         }
     });
@@ -58,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         slotMaxTime:"22:00",
         weekends:false,
         dayMaxEvents:3,
-        editable: true,
         droppable: true,
         views:{
             timeGrid: {
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var date = eventEdit.event.start.split("T")[0];
             var heureDebut = eventEdit.event.start.split("T")[1];
             var request = new XMLHttpRequest();
-            request.open("POST","admin/evenement/modifier/")
+            request.open("POST","/admin/evenement/modifier")
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 			//informations necessaires à date, heureDebut, salle, dureeCreneau, idEvenement ,idGroupeProjet
@@ -132,6 +132,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }*/
         },
+        eventClick: function(info) {
+            let  salle = prompt("Modifiez la salle")
+            let prof = prompt("Modifiez l'id")
+            info.event.title.split(" ")[0] = salle
+            info.event.title.split(" ")[1] = prof
+            alert('Event: ' + info.event.title);
+            console.log("event"+info.event.title);
+            // change the border color just for fun
+            info.el.style.borderColor = 'red';
+          },
         events: liste,
 
     });

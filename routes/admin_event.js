@@ -6,6 +6,7 @@ const db = require(path.join(__dirname, '..', 'bin', 'bdd')); // Permet la conne
 const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 const htmlspecialchars = require('htmlspecialchars');
+const { Console } = require('console');
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
 const modelEvenement = require(path.join(__dirname, '..', 'model', 'evenement'));
@@ -214,7 +215,7 @@ router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour
                 if(err)
                     throw err;
 
-                let accueil = template.toString().replace('<header>%</header>', header);
+                let accueil = template.toString().replace('<header>%</header>', header.toString());
 
                 modelEtudiant.getEvent(req.params.id).then((listEvent) => {
                     modelEtudiant.getProfEvent(req.params.id).then((profEvent) => {
@@ -229,10 +230,20 @@ router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour
                             console.log("Problème Duree Creneau")
                         })*/
                         //convertit en JSON le resultat des requetes SQL et les envois coté front
-                        let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>" //ajouter dureeCreneau : slotDuration
-                        console.log(donne)
-                        res.end(accueil.replace('<event></event>', donne))
-                        //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+                        console.log(req.params.id)
+                        modelCreneau.getEvent(req.params.id).then((nomEvent)=> {
+                            modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau)=> {                            
+                                let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + ";let dureeCreneau=" + JSON.stringify(dureeCreneau) + "</script>" //ajouter dureeCreneau : slotDuration
+                                console.log(nomEvent[0].nom)
+                                res.end(accueil.replace('<event></event>', donne).replace("%NOMEVENT%",htmlspecialchars(nomEvent[0].nom)))
+                                //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+                            }).catch(() => {
+                                console.log("Problème duree creneau")
+                            })
+                        }).catch(() => {
+                            console.log("Problème nom event")
+                        })
+                        
                     }).catch(() => {
                         console.log("Problème Prof event")
                     })

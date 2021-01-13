@@ -7,7 +7,7 @@ const auth = require (path.join(__dirname, '..', 'bin', 'auth'));
 const jwt = require('jsonwebtoken');
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
-const modelGroup = require(path.join(__dirname,'..', 'model', 'groupeprojet'));
+const modelGroup = require(path.join(__dirname,'..', 'model', 'groupeProjet'));
 const modelProf = require(path.join(__dirname,'..', 'model', 'professeur'));
 const modelComposer = require(path.join(__dirname,'..', 'model', 'composer'));
 
