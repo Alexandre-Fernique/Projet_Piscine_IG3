@@ -30,7 +30,11 @@ router.get('/', function(req, res, next) {
         res.writeHead(302, {'Location': '/admin'}); //On le redirige vers la page d'accueil connecté (C'est elle qui différencie un admin et un étudiant)
         res.end();
     } else {
-        res.end("Une erreur est suvernue, vous n'avez pas de status d'identification valide"); //Faire une page d'erreur
+        fs.readFile(__dirname +  '/error/index/id.html', (err, template) => { //Page de connexion -> Utilisateur non connecté
+            if (err)
+                throw err;
+            res.end(template)
+        });
     }
 });
 
@@ -47,6 +51,7 @@ router.get('/inscrit', function(req, res, next) {
                 if(promo['annee']!="Admin")
                     text += '<option value=' + promo['annee'] + '>' + promo['annee'] + '</option> ';
             }
+            console.log(text);
             res.end(template.toString().replace('< option/>',text));
 
         })

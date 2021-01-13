@@ -32,7 +32,20 @@ function update (values) {
 }
 
 
-function get (column, num) {
+function getByPromotion (promo) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM `evenements` WHERE anneePromo=?;";
+        db.query(sql, [promo], (err, result) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
+            else {
+                console.log(result);
+                resolve(result);
+            }
+        });
+    });
 }
 /*
 Sauf erreur, on a qu'un seul événement à la fois, donc on peut simplement retourner tout le contenu de la table et on aura toutes les infos d'un événements
@@ -50,10 +63,22 @@ function getAll () {
         });
     });
 }
-
-function getAllPromotion () {
+function getDateFinResa(anne) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM `promotion` WHERE 1;";
+        let sql = "SELECT dateLimiteResa FROM `evenements` WHERE anneePromo='"+anne+"';";
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    });
+}
+function getAllPromotionAvailable () {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM `promotion` promo WHERE promo.annee != 'Admin' AND promo.annee NOT IN ( SELECT e.anneePromo FROM evenements e)";
         db.query(sql, (err, result) => {
             if (err) {
                 reject(err);
@@ -65,10 +90,12 @@ function getAllPromotion () {
     });
 }
 
-function truncate () {
+function clearByEvent (idEvenement) {
     return new Promise(((resolve, reject) => {
-        let sql = "DELETE FROM `evenements`;";
-        db.query(sql, (err, result) => {
+        let sql = "DELETE " +
+            "FROM `evenements` " +
+            "WHERE anneePromo = ?;";
+        db.query(sql, [idEvenement], (err, result) => {
             if (err)
                 reject(err);
             else
@@ -77,4 +104,16 @@ function truncate () {
     }));
 }
 
-module.exports = {create, update, get, getAll, getAllPromotion, truncate};
+function getByPromo (toSelect, anneePromo) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT " + toSelect + "FROM `evenements` WHERE anneePromo=?;"
+        db.query(sql, [anneePromo], (err, result) => {
+            if (err)
+                reject(err);
+            else
+                resolve(result);
+        });
+    })
+}
+
+module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent, getByPromo};

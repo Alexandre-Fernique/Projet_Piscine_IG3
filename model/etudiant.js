@@ -44,23 +44,19 @@ function get (column, num) {
     });
 }
 // fonction qui permet de réserver un créneau disponible pour un groupe donné en paramètre(idGroupe) à un créneau donner(id)
-function changeCreneaux(id,idGroupe){
+function changeCreneaux(id,idGroupe,annee){
     return new Promise((resolve, reject) => {
         let sql = "UPDATE `creneaux` SET idGroupeProjet=NULL WHERE idGroupeProjet="+idGroupe+";"
-        let sql2 = "UPDATE `creneaux` SET idGroupeProjet="+idGroupe+" WHERE id="+id+" and idGroupeProjet IS NULL ;"
+        let sql2 = "UPDATE `creneaux`,`evenements` SET idGroupeProjet="+idGroupe+" WHERE creneaux.id="+id+" and evenements.id=idEvenement and anneePromo='" + annee + "' and idGroupeProjet IS NULL ;"
         db.query(sql, (err) => {
             if (err) {
-                console.log(err);
                 reject(err);
             }
             else {
-                console.log("Changement fait");
                 db.query(sql2, (err2) => {
                     if (err2) {
-                        console.log(err);
                         reject(err);
                    }
-                    console.log("Changement fait");
                 });
             }
         });
@@ -72,10 +68,8 @@ function getGrpId (num) {
         let sql = "SELECT `idGroupe` FROM `composer` WHERE numeroEtudiant=" + num + ";";
         db.query(sql, (err, result) => {
             if (err) {
-                console.log(err);
                 reject(err);
             } else {
-                console.log(result);
                 resolve(result);
             }
         });
@@ -84,39 +78,37 @@ function getGrpId (num) {
 /*
 Cette fonction est un getteur des créneaux(et leurs informations) en fonction de ta promo
 */
-function getEvent(anne,prof=false){
+function getEvent(anne){
     return new Promise((resolve ,reject)=>{
         //requete pour avoir tout les creneaux
         //"SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle` FROM `evenements`,`creneaux` WHERE evenements.id=idEvenement and anneePromo='" + anne + "';"
-        if(prof) {
-            let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`, professeurs.nom,`prenom`,`idGroupeProjet` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
-            db.query(sql, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    reject(err);
-                } else {
-                    console.log(result);
-                    resolve(result);
-                }
-            });
-        }
-        else{
-            let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`,`idGroupeProjet` FROM `evenements`,`creneaux`,`participe` WHERE evenements.id=idEvenement and creneaux.id!=idCreneaux and anneePromo='" + anne + "' GROUP BY creneaux.id;"
-            //requete pour avoir les prof en plus
-            // SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`, professeurs.nom,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='IG3';
-            db.query(sql, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    reject(err);
-                } else {
-                    console.log(result);
-                    resolve(result);
-                }
-            });
-        }
 
+        let sql = "SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`,`idGroupeProjet` FROM `evenements`,`creneaux` WHERE evenements.id=idEvenement and anneePromo='" + anne + "' GROUP BY creneaux.id;"
+        //requete pour avoir les prof en plus
+        // SELECT creneaux.id,`date`, `heureDebut`, `dureeCreneau`,`salle`, professeurs.nom,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='IG3';
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
     });
 }
+//function getteur pour avoir les nom des prof associé au créneaux d'une promo
+function getProfEvent(anne){
+    return new Promise(((resolve, reject) => {
+        let sql = "SELECT `creneaux`.`id`, `professeurs`.`nom`,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    }))
+}
+//function pour le chanegemnt de mot de passe
 function changePassword(oldPassword,newPassword,num){
     return new Promise((resolve,reject)=>{
 
@@ -129,7 +121,7 @@ function changePassword(oldPassword,newPassword,num){
                 reject("etudiant introuvable")
             else if(passwordHash.verify(oldPassword,result[0].motDePasse)){
                 let sql="UPDATE `etudiants` SET `motDePasse` = ? WHERE `numero` = "+num+";";
-                db.query(sql,newPassword,(err,result)=>{
+                db.query(sql,newPassword,(err)=>{
                     if(err)
                         reject(err)
                     else {
@@ -144,4 +136,31 @@ function changePassword(oldPassword,newPassword,num){
         })
     })
 }
-module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword };
+function changeMail(oldMAil,newMail,num){
+    return new Promise((resolve,reject)=>{
+
+        let sql="SELECT `mail` from `etudiants` where numero="+num+";";
+
+        db.query(sql,(err,result)=>{
+            if(err)
+                reject(err)
+            if(result===undefined)
+                reject("etudiant introuvable")
+            else if(oldMAil==result[0].mail){
+                let sql="UPDATE `etudiants` SET `mail` = ? WHERE `numero` = "+num+";";
+                db.query(sql,newMail,(err)=>{
+                    if(err)
+                        reject(err)
+                    else {
+                        resolve("Done")
+                    }
+                })
+            }
+            else {
+                reject("Mail différent")
+            }
+
+        })
+    })
+}
+module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword,getProfEvent,changeMail };

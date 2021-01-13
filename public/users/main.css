@@ -968,7 +968,7 @@ A VERTICAL event
     top: 0;
     bottom: 0;
     max-height: 100%; /* clip overflow */
-    overflow: hidden;
+    overflow: auto;
   }
 
 .fc-v-event:not(.fc-event-start) {
@@ -1071,7 +1071,7 @@ A VERTICAL event
     z-index: 1;
   }
 .fc .fc-timegrid-slot { /* a <td> */
-    height: 2.5em;
+    height: 2em;
     border-bottom: 0 /* each cell owns its top border */
   }
 .fc .fc-timegrid-slot:empty:before {
