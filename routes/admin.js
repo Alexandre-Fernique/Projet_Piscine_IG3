@@ -76,14 +76,53 @@ router.get('/modifierMDP',(req,res,next)=>{
         })
     })
 });
+router.get('/modifierMail',(req,res,next)=>{
+    if (auth(req, res, next) !== 1) {
+        res.end("T'as rien à faire là ");
+    }
+    fs.readFile(path.join(__dirname, 'view', 'Admin', 'ModificationMail.html'),(err,template)=>{
+        if(err)
+            throw err;
+        fs.readFile(path.join(__dirname, 'view','Admin', 'header.html'), (err, header) => {
+            if (err)
+                throw err;
 
-router.post('/modifier',(req,res,)=>{
+            let token = req.cookies['token'];
+            const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+            modelEtudiant.get("prenom,anneePromo", decodedToken["numeroEt"]).then((requete) => {
+                //On ajoute Bonjour, <Prénom> dans l'entête
+                let headerPerso = header.toString().replace('%NOM%', htmlspecialchars(requete[0].prenom));
+                //On ajoute l'entête dans notre page
+                let accueil = template.toString().replace('<header>%</header>', headerPerso);
+                res.end(accueil);
+
+            }).catch( () => {
+                console.log("Problème");
+                res.end("Huston on a un problème"); // Faire une page d'erreur
+            });
+        })
+    })
+});
+router.post('/modifMail',(req,res,)=>{
+
+    let oldMail =  recupParam(req,"oldMail")
+    let newMail = recupParam(req,"newMail")
+    let token = req.cookies['token'];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    modelEtudiant.changeMail(oldMail,newMail,decodedToken["numeroEt"]).then(() => {
+        res.end("okay")
+    }).catch( () => {
+        res.end("Problème huston"); // Faire une page d'erreur
+    });
+})
+
+router.post('/modifMDP',(req,res,)=>{
 
     let oldPassword = cle + recupParam(req,"oldPassword")
     let newPassword = passwordHash.generate(cle+recupParam(req,"newPassword"))
     let token = req.cookies['token'];
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-    modelEtudiant.changePassword(oldPassword,newPassword,decodedToken["numeroEt"]).then((requete) => {
+    modelEtudiant.changePassword(oldPassword,newPassword,decodedToken["numeroEt"]).then(() => {
         res.end("okay")
     }).catch( () => {
         res.end("Problème huston"); // Faire une page d'erreur

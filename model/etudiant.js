@@ -121,7 +121,7 @@ function changePassword(oldPassword,newPassword,num){
                 reject("etudiant introuvable")
             else if(passwordHash.verify(oldPassword,result[0].motDePasse)){
                 let sql="UPDATE `etudiants` SET `motDePasse` = ? WHERE `numero` = "+num+";";
-                db.query(sql,newPassword,(err,result)=>{
+                db.query(sql,newPassword,(err)=>{
                     if(err)
                         reject(err)
                     else {
@@ -136,4 +136,31 @@ function changePassword(oldPassword,newPassword,num){
         })
     })
 }
-module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword,getProfEvent };
+function changeMail(oldMAil,newMail,num){
+    return new Promise((resolve,reject)=>{
+
+        let sql="SELECT `mail` from `etudiants` where numero="+num+";";
+
+        db.query(sql,(err,result)=>{
+            if(err)
+                reject(err)
+            if(result===undefined)
+                reject("etudiant introuvable")
+            else if(oldMAil==result[0].mail){
+                let sql="UPDATE `etudiants` SET `mail` = ? WHERE `numero` = "+num+";";
+                db.query(sql,newMail,(err)=>{
+                    if(err)
+                        reject(err)
+                    else {
+                        resolve("Done")
+                    }
+                })
+            }
+            else {
+                reject("Mail différent")
+            }
+
+        })
+    })
+}
+module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword,getProfEvent,changeMail };

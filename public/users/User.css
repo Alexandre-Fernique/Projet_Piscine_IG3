@@ -6,7 +6,7 @@ body {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-align: center;
-    padding-top: 80px;
+    padding-top: 40px;
     padding-bottom: 40px;
     background-color: #f5f5f5;
     background-image: url("/images/fond.png");
@@ -14,6 +14,9 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
+}
+.body-user{
+    padding-top: 80px;
 }
 #calendar{
     margin-left: auto;
@@ -50,7 +53,7 @@ h1{
     max-width: 700px;
     height: fit-content;
     padding: 30px 30px 30px 30px;
-    margin: 0 auto;
+    margin: auto;
     background-color: #f5f5f5;
     border-radius: 20px;
     box-shadow: 2px 2px 12px black;

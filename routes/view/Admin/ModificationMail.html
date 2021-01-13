@@ -18,27 +18,27 @@
 <header>%</header>
 <form class="form-signin text-center" id="form-signin" method="post" action="/admin/modifier" >
     <h1 class="h1 mb-5 font-weight-normal">
-        Changement de mot de passe
+        Changement de mail
     </h1>
     <div class="alert alert-success" role="alert" name="alert" hidden>
-        Mot de passe modifié
+        Mail modifié
     </div>
     <div class="alert alert-danger" role="alert" name="alert" hidden>
-        Mot de passe rentré incorrect
+        Mail incorrect
     </div>
     <div class="form-floating mb-4">
-        <input type="password" class="form-control" id="floatingOldPassword" name="oldPassword" placeholder="Password" required>
-        <label for="floatingOldPassword">Ancien mot de passe</label>
+        <input type="email" class="form-control" id="floatingOldMail" name="oldMail" placeholder="Mail" required>
+        <label for="floatingOldMail">Ancien Mail</label>
     </div>
     <div class="form-floating mb-4">
-        <input type="password" class="form-control" id="floatingNewPassword" name="newPassword" placeholder="Password" required>
-        <label for="floatingNewPassword">Nouveau mot de passe</label>
+        <input type="email" class="form-control" id="floatingNewMail" name="newMail" placeholder="Mail" required>
+        <label for="floatingNewMail">Nouveau Mail</label>
     </div>
     <div class="form-floating mb-4">
-        <input type="password" class="form-control" id="floatingConfPassword" placeholder="Password" required>
-        <label for="floatingConfPassword">Confirmation de mot de passe</label>
+        <input type="email" class="form-control" id="floatingConfMail" placeholder="Mail" required>
+        <label for="floatingConfMail">Confirmation de Mail</label>
         <div class="invalid-feedback">
-            Entrez un mot de passe identique
+            Entrez un mail identique
         </div>
     </div>
     <span id="alerteMAJ" class = "link-danger ">
@@ -53,9 +53,9 @@
     <script type = "text/javascript">
         let capsMessage = document.getElementById('alerteMAJ');
         capsMessage.style.display = 'none';
-        let oldPassword = document.getElementById("floatingOldPassword");
-        let confPassword = document.getElementById("floatingConfPassword");
-        let newPassword = document.getElementById('floatingNewPassword');
+        let oldPassword = document.getElementById("floatingOldMail");
+        let confPassword = document.getElementById("floatingConfMail");
+        let newPassword = document.getElementById('floatingNewMail');
         let button=document.getElementById("button")
         let password =[oldPassword,confPassword,newPassword];
         for(let i of password) {
@@ -87,10 +87,10 @@
         form.addEventListener('submit',(event)=>{
             event.preventDefault();
             var request = new XMLHttpRequest();
-            request.open("POST","/admin/modifMDP")
+            request.open("POST","/admin/modifMail")
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            let data ="oldPassword="+document.getElementById("floatingOldPassword").value+"&newPassword="+document.getElementById("floatingNewPassword").value
+            let data ="oldMail="+document.getElementById("floatingOldMail").value+"&newMail="+document.getElementById("floatingNewMail").value
             request.send(data);
             request.onload=()=>{
                 console.log(request.response);
