@@ -14,6 +14,7 @@ function create(idgroup,numEtudiants){
                     reject(err);
                 } else {
                     resolve(result);
+                    console.log(result);
                 }
             });
         }

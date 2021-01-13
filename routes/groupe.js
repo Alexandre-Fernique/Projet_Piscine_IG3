@@ -35,8 +35,9 @@ router.all('/', (req, res, next) => { //Page d'accueil utilisateur
                             let text = '<script>let etu=`<option selected disabled value=""> Etudiants </option>'
                             let string = JSON.parse(JSON.stringify(result))
                             for (let etudiant of string) {
+                                if (etudiant['numero']!=decodedToken["numeroEt"]){
                                 text += '<option value="' + etudiant['numero'] +'" >' + etudiant['nom'] +' '+ etudiant['prenom']+ '</option> ';
-                            }
+                            }}
                             console.log(text);
                             console.log(result.toString().replace('<etudiant></etudiant>', text+"`</script>"));
                             res.end(groupe.toString().replace('<etudiant></etudiant>', text+"`</script>"));
