@@ -28,11 +28,11 @@ CREATE TABLE IF NOT EXISTS `creneaux` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
   `heureDebut` time NOT NULL,
-  `salle` varchar(6) DEFAULT NULL,
+  `salle` varchar(6) DEFAULT "PAS DE SALLE",
   `idEvenement` int(11) NOT NULL,
   `idGroupeProjet` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idEvenement` (`idEvenement`),
+  KEY `idEvenement` (`id`),
   KEY `idGroupeProjet` (`idGroupeProjet`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
