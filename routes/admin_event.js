@@ -70,33 +70,38 @@ router.all('/created', (req, res, next) => {
         let nombreMembresJury = recupParam(req, "nombreMembresJury");
         let anneePromo = recupParam(req, "anneePromo");
 
-        let sql = "SELECT * FROM `evenements` WHERE nom='"+nomEvent+"' && anneePromo='"+anneePromo+"';";
-        db.query(sql, (err, row) => {
-            if (err) throw err;
-            if (row && row.length ) {
-                console.log('Evenement existe déjà dans la base de données!');
-                let alert = require('alert');
-                alert("L'évenement "+ nomEvent +" concernant la promo "+ anneePromo +" existe déjà !")
-                res.writeHead(302, {'Location': '/admin/evenement/create'});
-                res.end();
-            } else {
-                modelEvenement.create([nomEvent ,dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo])
-                    .then((retour) => {
-                        console.log(retour);
-                        res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
-                        res.end();
-                    })
-                    .catch(
-                        function (err) {
-                            console.log(err);
-                            fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
-                                content = content.toString().replace('<header>%</header>', "");
-                                res.end(content);
-                            });
-                        }
-                    );
-            }
-        });
+        modelEvenement.getByPromo("*", anneePromo)
+            .then((row) => {
+                if (row && row.length ) {
+                    let alert = require('alert');
+                    alert("Vous avez déjà un évenement en cours pour les " + anneePromo + " !")
+                    res.writeHead(302, {'Location': '/admin/evenement/read/' + anneePromo});
+                    res.end();
+                } else {
+                    modelEvenement.create([nomEvent ,dateDebut, Duree, dateLimiteResa, dureeCreneau, nombreMembresJury, anneePromo])
+                        .then((retour) => {
+                            console.log(retour);
+                            res.writeHead(302, {'Location': '/admin/evenement/list'}); //On le redirige vers la vue de cet évenement
+                            res.end();
+                        })
+                        .catch(
+                            function (err) {
+                                console.log(err);
+                                fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                                    content = content.toString().replace('<header>%</header>', "");
+                                    res.end(content);
+                                });
+                            }
+                        );
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                    content = content.toString().replace('<header>%</header>', "");
+                    res.end(content);
+                });
+            })
     }
 });
 

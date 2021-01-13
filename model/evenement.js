@@ -92,4 +92,16 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent};
+function getByPromo (toSelect, anneePromo) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT " + toSelect + "FROM `evenements` WHERE anneePromo=?;"
+        db.query(sql, [anneePromo], (err, result) => {
+            if (err)
+                reject(err);
+            else
+                resolve(result);
+        });
+    })
+}
+
+module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent, getByPromo};
