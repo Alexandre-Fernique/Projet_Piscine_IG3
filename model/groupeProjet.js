@@ -48,6 +48,20 @@ function truncate () {
         });
     }));
 }
+function getInfoGrp(groupeprojet){
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT nomTuteurEntreprise,prenomTuteurEntreprise,nomEntreprise,professeurs.nom ,professeurs.prenom FROM groupeprojet,professeurs WHERE professeurs.id=idProfesseur and groupeprojet.id = ? ;";
+        db.query(sql,groupeprojet, (err,result) => {
+            if (err){
+                console.log(err);
+                reject(err);
+            }
+            else
+                resolve(result);
+        });
+    });
+}
+
 // function truncate () {
 //     return new Promise(((resolve, reject) => {
 //         let sql = "DELETE FROM `groupeprojet`;";
@@ -60,4 +74,4 @@ function truncate () {
 //     }));
 // }
 
-module.exports = {create,truncate,select}
+module.exports = {create,truncate,select,getInfoGrp}

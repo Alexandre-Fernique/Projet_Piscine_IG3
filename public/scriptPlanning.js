@@ -16,7 +16,6 @@ function addTime(heure,duree){
     return returnHours+":"+returnMinute+":00";
 }
 let liste=[]
-let now="";
 for (let event of tampon) {
     let data ={};
     //Si c'est le créneaux du groupe contenant l'étdiant qui à chargé la page
@@ -28,39 +27,14 @@ for (let event of tampon) {
     }
     if(prof!=="")
         prof="Jury: "+prof.substring(0,prof.length-2);
-    if(IdProjet[0].idGroupe == event.idGroupeProjet){
-        data = {
-            id: event.id,
-            title: event.salle+" Votre créneaux "+prof,
-            color:"#c60075",
-            start: event.date.split("T")[0] + "T" + event.heureDebut,
-            end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau),
-        };
-        now=event.date.split("T")[0];
-    }
-    //Si c'est le créneaux d'un autre étudiant
-    else if(event.idGroupeProjet!=null){
-        data = {
-            id: event.id,
-            title:event.salle+" Non disponible  "+prof,
-            color:"#343a40",
-            start: event.date.split("T")[0] + "T" + event.heureDebut,
-            end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau),
-        };
-    }
-    //Si le créneaux est vide
-    else {
-        data = {
-            id: event.id,
-            title: event.salle+" Disponible "+prof,
-            start: event.date.split("T")[0] + "T" + event.heureDebut,
-            end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau),
-            url: '/users/reservation/' + event.id
-        };
-    }
+    data = {
+        id: event.id,
+        title: event.salle+" "+prof,
+        start: event.date.split("T")[0] + "T" + event.heureDebut,
+        end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau),
+    };
     console.log(event.prof)
     liste.push(data);
-
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -78,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         views:{
             timeGrid: {
                 dayHeaderFormat:{ weekday: 'long',day:'numeric'},
-                },
+            },
             dayGridMonth: {
                 dayHeaderFormat:{ weekday: 'long'},
             }
@@ -100,9 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
         events: liste
     });
     calendar.setOption('locale', 'fr');
-    if(now != ""){
-        calendar.gotoDate(now);
-    }
     calendar.render();
 });
 

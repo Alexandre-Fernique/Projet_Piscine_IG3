@@ -184,5 +184,28 @@ router.get('/deconnexion', (req, res, next) => {
     res.writeHead(302, {'Location': '/'});
     res.status(200).end();
 });
+router.get('/afficher/:id',(req,res,next)=>{
+    fs.readFile(path.join(__dirname, 'view', 'accueil','planning.html'),(err,template)=>{
+        if(err)
+            throw err;
+        console.log(req.params.id)
+        modelEtudiant.getEvent(req.params.id).then((listEvent) => {
+            modelEtudiant.getProfEvent(req.params.id).then((profEvent) => {
+                //convertit en JSON le resultat des requetes SQL et les envois coté front
+                let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + "</script>"
+                res.end(template.toString().replace('<lesevents></lesevents>', donne))
+                //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
+
+            }).catch(() => {
+                console.log("Problème Prof event")
+            })
+        }).catch(() => {
+            console.log("Problème event ou groupe");
+            //Si l'étudiant n'a pas de groupe ou erreur dans la requête SQL des events
+        })
+
+    })
+
+});
 
 module.exports = router;
