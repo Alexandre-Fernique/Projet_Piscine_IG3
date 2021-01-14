@@ -29,11 +29,38 @@ function modifier (values) {
     });
 }
 
-
-function getEvent (idEvent) {
+function modifierSalle(values) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT `nom` FROM `evenements` WHERE anneePromo=? ";
-        db.query(sql, idEvent,(err, result) => {
+        let sql = "UPDATE `creneaux` SET  `salle` = ? WHERE `id` = ? ;";
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
+            else
+                resolve(result);
+        });
+    });
+}
+
+function modifierProf(values) {
+    return new Promise((resolve, reject) => {
+        let sql = "INSERT INTO `participe` (`idCreneaux` , `idProfesseur`) VALUES (?,?) ;";
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
+            else
+                resolve(result);
+        });
+    });
+}
+
+function getEvent (idPromo) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT `id`,`nom` FROM `evenements` WHERE anneePromo=? ";
+        db.query(sql, idPromo,(err, result) => {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -114,4 +141,4 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent}
+module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent, modifierProf ,modifierSalle}

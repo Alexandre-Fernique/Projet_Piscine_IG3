@@ -116,4 +116,4 @@ function getByPromo (toSelect, anneePromo) {
     })
 }
 
-module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent, getByPromo};
+module.exports = {create, update, getByPromotion, getAll, getAllPromotionAvailable, clearByEvent, getByPromo ,getDateFinResa };

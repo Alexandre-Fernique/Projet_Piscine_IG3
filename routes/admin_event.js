@@ -228,8 +228,7 @@ router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour
                         modelCreneau.getEvent(req.params.id).then((nomEvent)=> {
                             modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau)=> {                            
                                 let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + ";let dureeCreneau=" + JSON.stringify(dureeCreneau) + ";let eventID=" + JSON.stringify(nomEvent[0].id) + "</script>" //ajouter dureeCreneau : slotDuration
-                                console.log(nomEvent[0].nom)
-
+                                console.log(nomEvent[0].id + "_____________" + profEvent[0].id)
                                 res.end(accueil.replace('<event></event>', donne).replace("%NOMEVENT%",htmlspecialchars(nomEvent[0].nom)))
                                 //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
                             }).catch(() => {
@@ -292,7 +291,7 @@ router.post('/modifier', (req, res, next) => { //Ajouter u crenau à un evenemen
         //"INSERT INTO `creneaux` (`date`, `heureDebut`, `salle`, `idEvenement`, `idGroupeProjet`)
         let id = recupParam(req, "id");
         let date = recupParam(req, "date");
-        let heureDebut = recupParam(req, "heureDebut").split("+")[0];
+        let heureDebut = recupParam(req, "heureDebut").split(" ")[0];
         console.log(heureDebut);
         modelCreneau.modifier([date, heureDebut, id])
             .then((retour) => {
@@ -304,6 +303,44 @@ router.post('/modifier', (req, res, next) => { //Ajouter u crenau à un evenemen
                     res.end("ERROR");
                 }
             );
+    }
+});
+router.post('/addSalleProf', (req, res, next) => { //Ajouter u crenau à un evenement
+    if (auth(req, res, next) !== 1) {
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
+    } else {
+        console.log("addSalleeeee")
+        let salle = recupParam(req, "salle");
+        let id = recupParam(req, "id");
+        let prof = recupParam(req, "prof");
+        console.log(salle);
+        console.log(prof);
+        modelCreneau.modifierSalle([salle,id])
+            .then((retour) => {
+                modelCreneau.modifierProf([id,prof])
+                .then((retour) => {
+                    console.log(retour)
+                    //res.writeHead(302, {'Location': '/admin/evenement/addCreneau:id'});
+                    res.end("OK");
+                })
+                .catch(
+                    function () {
+                        console.log("Une erreur est survenue dans la fonction");
+                        res.end("ERROR");
+                    }
+            );
+            })
+            .catch(
+                function () {
+                    console.log("Une erreur est survenue dans la fonction");
+                    res.end("ERROR");
+                }
+        );
     }
 });
 

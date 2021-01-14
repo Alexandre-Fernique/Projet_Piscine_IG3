@@ -24,15 +24,17 @@ for (let event of tampon) {
     {
         if(i.id===event.id)
             prof+=i.nom+" "+i.prenom+", ";
+        prof="Jury: "+prof.substring(0,prof.length-2)
     }
     let data ={};
     data = {
         id: event.id,
-        title: event.salle+" "+event.prof,
+        //title: event.salle+" "+event.prof,
+        title: event.prof,
         start: event.date.split("T")[0] + "T" + event.heureDebut,
         end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau)
     };
-    console.log("HEYYYYYYYYY"+event.prof);
+    console.log("HEYYYYYYYYY"+data.title);
     liste.push(data);
     console.log(liste);
 
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
-        titleFormat:event.id,
+        titleFormat:{ year: 'numeric', month: 'long', day: 'numeric' },
         allDaySlot:false,
         slotMinTime:"07:00",
         scrollTime:"08:00",
@@ -61,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dayMaxEvents:3,
         editable:true,
         droppable: true,
+        selectable : true,
         views:{
             timeGrid: {
                 dayHeaderFormat:{ weekday: 'long',day:'numeric'},
@@ -83,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,next',
         },
+        //MODIFICATION DU CRENEAU EN LE GLISSANT DANS LES CASES DU PLANNING
         eventDrop : function(eventEdit) {
             var id = eventEdit.event.id;
             var date = eventEdit.event.startStr.split("T")[0];
@@ -95,9 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
             let data ="id="+id+"&date="+date+"&heureDebut="+heureDebut ;
             console.log(data);
             request.send(data);
-            /*request.onload=()=>{
+            request.onload=()=>{
                 console.log(request.response);
-                if(request.response==="okay"){
+            }    
+            /*if(request.response==="okay"){
                     alert[0].hidden=false
                     alert[1].hidden=true
                 }
@@ -107,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }*/
         } ,
+        //CREATION D'UN CRENEAU
         drop : function(event) {
             //date_object
             let url = window.location.href.split("/");
@@ -135,16 +141,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }*/
         },
+        //AJOUTER LA SALLE ET LE PROF
         eventClick: function(info) {
             let  salle = prompt("Modifiez la salle")
             let prof = prompt("Modifiez l'id")
-            info.event.title.split(" ")[0] = salle
-            info.event.title.split(" ")[1] = prof
-            alert('Event: ' + info.event.title);
-            console.log("event"+info.event.title);
+            let id = info.event.id;
+            var request = new XMLHttpRequest();
+            request.open("POST","/admin/evenement/addSalleProf" )
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            let data ="salle="+salle+"&prof="+prof + "&id="+id ;
+            alert('Event: ' + data);
+            request.send(data);
+            request.onload=()=>{
+                console.log("MA reponse"+request.response);
+            }
             // change the border color just for fun
             info.el.style.borderColor = 'red';
-          },
+        },
         events: liste,
 
     });

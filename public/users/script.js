@@ -26,6 +26,7 @@ for (let event of tampon) {
         if(i.id===event.id)
             prof+=i.nom+" "+i.prenom+", ";
     }
+    console.log("FERGT5Y67J"+prof);
     if(prof!=="")
         prof="Jury: "+prof.substring(0,prof.length-2);
     if(IdProjet[0].idGroupe == event.idGroupeProjet){
@@ -58,6 +59,7 @@ for (let event of tampon) {
             url: '/users/reservation/' + event.id
         };
     }
+    console.log(event.prof)
     liste.push(data);
 
 }
