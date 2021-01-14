@@ -17,7 +17,6 @@ function addTime(heure,duree){
 }
 let liste=[]
 
-let now="";
 for (let event of tampon) {
     let prof ="";
     for (let i of ProfEvent)
@@ -39,6 +38,9 @@ for (let event of tampon) {
     console.log(liste);
 
 }
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     let calendarEl = document.getElementById('calendar');
     var draggable = document.getElementById('external-events')
@@ -46,9 +48,23 @@ document.addEventListener('DOMContentLoaded', function() {
     new FullCalendar.Draggable(draggable, {
         itemSelector: '.fc-event',
         eventData: function(eventEl) {
-          return {
-            duration : dureeCreneau
-          };
+            var requetID= new XMLHttpRequest();
+            requetID.open("GET","/admin/evenement/idcreneau",false);
+            let data={}
+            requetID.onload=()=> {
+                data ={
+                    id: requetID.response,
+                    title:"PAS DE SALLE",
+                    duration: dureeCreneau[0].dureeCreneau,
+                };
+                console.log(data)
+            }
+            console.log(data)
+            requetID.send()
+            return data
+
+
+
         }
     });
 
@@ -62,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         weekends:false,
         dayMaxEvents:3,
         editable:true,
+        eventDurationEditable:false,
         droppable: true,
         selectable : true,
         views:{
@@ -163,9 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     });
     calendar.setOption('locale', 'fr');
-    if(now != ""){
-        calendar.gotoDate(now);
-    }
+
     calendar.render();
 });
 

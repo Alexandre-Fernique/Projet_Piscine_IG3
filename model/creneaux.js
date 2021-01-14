@@ -4,15 +4,24 @@ const db = require(path.join(__dirname, '../bin/bdd'));
 function createCreneau (values) {
     return new Promise((resolve, reject) => {
         let sql = "INSERT INTO `creneaux` (`date`, `heureDebut`, `idEvenement`) VALUES (?, ?, ?);";
-        db.query(sql, values, (err, result) => {
+        db.query(sql, values, (err) => {
             if (err) {
                 console.log(err);
                 reject(err);
             }
-            else
-                resolve(result);
         });
     });
+}
+function getIdLastCreate(){
+    return new Promise(((resolve, reject) => {
+        db.query("SELECT MAX(id) AS id from creneaux;",(err,result)=>{
+            console.log(result)
+            if (err)
+                reject(err)
+
+            resolve(result)
+        })
+    }))
 }
 
 function modifier (values) {
@@ -57,10 +66,17 @@ function modifierProf(values) {
     });
 }
 
+<<<<<<< HEAD
 function getEvent (idPromo) {
     return new Promise((resolve, reject) => {
         let sql = "SELECT `id`,`nom` FROM `evenements` WHERE anneePromo=? ";
         db.query(sql, idPromo,(err, result) => {
+=======
+function getEvent (anne) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT `id`,`nom` FROM `evenements` WHERE anneePromo=? ";
+        db.query(sql, anne,(err, result) => {
+>>>>>>> 3ea548b362257c3b840a44b0423fa04bd26df8c5
             if (err) {
                 console.log(err);
                 reject(err);
@@ -141,4 +157,8 @@ function clearByEvent (idEvenement) {
     }));
 }
 
+<<<<<<< HEAD
 module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent, modifierProf ,modifierSalle}
+=======
+module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent,getIdLastCreate}
+>>>>>>> 3ea548b362257c3b840a44b0423fa04bd26df8c5

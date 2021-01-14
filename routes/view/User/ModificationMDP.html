@@ -93,7 +93,6 @@
             let data ="oldPassword="+document.getElementById("floatingOldPassword").value+"&newPassword="+document.getElementById("floatingNewPassword").value
             request.send(data);
             request.onload=()=>{
-                console.log(request.response);
                 if(request.response==="okay"){
                     alert[0].hidden=false
                     alert[1].hidden=true
