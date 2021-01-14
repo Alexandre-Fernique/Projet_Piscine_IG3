@@ -26,7 +26,7 @@ function getIdLastCreate(){
 
 function modifier (values) {
     return new Promise((resolve, reject) => {
-        let sql = "UPDATE `creneaux` SET  `date` = ? , `heureDebut` = ? WHERE `id` = ?";
+        let sql = "UPDATE `creneaux` SET  `date` = ? , `heureDebut` = ? WHERE `id` = ?;";
         db.query(sql, values, (err, result) => {
             if (err) {
                 console.log(err);
@@ -52,17 +52,22 @@ function modifierSalle(values) {
     });
 }
 
-function modifierProf(values) {
+function modifierProf(idCreneau, idProf) {
     return new Promise((resolve, reject) => {
-        let sql = "INSERT INTO `participe` (`idCreneaux` , `idProfesseur`) VALUES (?,?) ;";
-        db.query(sql, values, (err, result) => {
-            if (err) {
-                console.log(err);
-                reject(err);
-            }
-            else
-                resolve(result);
-        });
+        for (let i = 0; i < idProf.length; ++i){
+            let idP = idProf[i];
+            console.log("6666666666666666666666666"+idP)
+            let sql = "INSERT INTO `participe` (`idCreneaux`,`idProfesseur`) VALUES (?,?);";
+            db.query(sql,[idCreneau,idP],(err, result)=>{
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                } else {
+                    resolve(result);
+                    console.log(result);
+                }
+            });
+        }
     });
 }
 
@@ -128,7 +133,18 @@ function getDureeCreneau(idCreneau) {
     });
 }
 
-
+function getProf(){
+    return new Promise(((resolve, reject) => {
+        let sql = "SELECT id,`nom`,`prenom` FROM `professeurs` ;"
+        db.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    }))
+}
 function clearByEvent (idEvenement) {
     return new Promise(((resolve, reject) => {
         let sql = "DELETE " +
@@ -150,4 +166,4 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-module.exports = {createCreneau ,modifier, getEvent, getGroupe , getCreneau,getDureeCreneau,getIdLastCreate, clearByEvent, modifierProf ,modifierSalle}
+module.exports = {createCreneau , getProf,modifier, getEvent, getGroupe , getCreneau,getDureeCreneau,getIdLastCreate, clearByEvent, modifierProf ,modifierSalle}

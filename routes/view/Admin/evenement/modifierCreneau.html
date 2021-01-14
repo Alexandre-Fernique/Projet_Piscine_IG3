@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Evenement</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/evenement.css">
+    <link rel="stylesheet" href="/stylesheets/header.css">
+    
+    <prof></prof>
+
+</head>
+<body class="container">
+<header>%</header>
+<div>
+    <form id="idCreneau" action="/admin/evenement/afficherSalleProf/:id" method="get">
+        <input type="hidden" name="id" value = "%id%">
+        
+                <label for="salle">
+                    Salle :
+                </label>
+                <input id="salle" class="form-control  mb-4" type="text" name="salle" >
+        
+                <div id="Cible">
+                    
+                </div>
+                
+        
+        <div class = "center">
+            <button type="submit" class="btn btn-primary">Valider</button>
+            <a type="submit" href = "/admin/evenement/read/:id" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+    <script>
+        for(let i=0;i<nbJury;i++){
+            
+            document.getElementById('Cible').innerHTML += "<div class='form-group'>\n<label for='nom'>Prof</label>\n<select  class='form-control' id='nom' name='nom'>"+prof+"</select></div>";
+        }
+        let url = window.location.href.split("/");
+        document.getElementById('idCreneau').action="/admin/evenement/afficherSalleProf/"+url[url.length-1]; 
+    </script>
+</body>
+</html>

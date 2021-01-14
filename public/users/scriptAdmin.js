@@ -12,31 +12,42 @@ function addTime(heure,duree){
         returnMinute = "0" + returnMinute;
 
 
-
     return returnHours+":"+returnMinute+":00";
 }
-let liste=[]
-
+let liste = []
 for (let event of tampon) {
+    let data ={};
     let prof ="";
+    let couleur="";
+    let statue="";
     for (let i of ProfEvent)
     {
-        if(i.id===event.id){
+        if(i.id===event.id)
             prof+=i.nom+" "+i.prenom+", ";
-        }
     }
-    let data ={};
+    if(prof!=="")
+        prof="Jury: "+prof.substring(0,prof.length-2);
+
+    if(event.idGroupeProjet==null)
+        statue=" Non Réservé ";
+    else
+        statue=" Réservé ";
+
+    //Si le créneau a été réservé par un groupe
+
     data = {
         id: event.id,
-        title: event.salle+" "+event.prof,
-        //title: event.prof,
+        title: ""+event.salle+statue+prof,
+        color:couleur,
         start: event.date.split("T")[0] + "T" + event.heureDebut,
-        end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau)
+        end: event.date.split("T")[0] + "T" +addTime(event.heureDebut,event.dureeCreneau),
+        classNames:"event-display",
+        url : "/admin/evenement/modifierSalleProf/" + event.id
     };
-    console.log("HEYYYYYYYYY"+data.title);
-    liste.push(data);
-    console.log(liste);
 
+
+
+    liste.push(data);
 }
 
 
@@ -56,15 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     id: requetID.response,
                     title:"PAS DE SALLE",
                     duration: dureeCreneau[0].dureeCreneau,
+                    url : "/admin/evenement/modifierSalleProf/" + requetID.response
                 };
                 console.log(data)
             }
             console.log(data)
             requetID.send()
             return data
-
-
-
         }
     });
 
@@ -160,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         //AJOUTER LA SALLE ET LE PROF
         eventClick: function(info) {
-            let  salle = prompt("Modifiez la salle")
+            /*let  salle = prompt("Modifiez la salle")
             let prof = prompt("Modifiez l'id")
             let id = info.event.id;
             var request = new XMLHttpRequest();
@@ -174,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log("MA reponse"+request.response);
             }
             // change the border color just for fun
-            info.el.style.borderColor = 'red';
+            info.el.style.borderColor = 'red';*/
         },
         events: liste,
 

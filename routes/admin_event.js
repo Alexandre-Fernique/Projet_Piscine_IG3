@@ -12,6 +12,7 @@ const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 const modelEvenement = require(path.join(__dirname, '..', 'model', 'evenement'));
 const modelCreneau = require(path.join(__dirname, '..', 'model', 'creneaux'));
 const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
+const modelProf = require(path.join(__dirname, '..', 'model', 'professeur'));
 
 
 function miseAJourPage (template, donnee, id) {
@@ -53,6 +54,87 @@ router.all('/create', (req, res, next) => { //Création de l'évenement
                 res.end(accueil)
             });
         });
+    }
+});
+
+router.all('/modifierSalleProf/:id', (req, res, next) => { //Création de l'évenement
+    if (auth(req, res, next) !== 1) {
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
+    } else {
+        console.log("OK");
+        fs.readFile(path.join(__dirname, 'view', 'Admin', 'evenement', 'modifierCreneau.html'), (err, template) => {
+            if (err)
+                throw err;
+            else {
+                fs.readFile(path.join(__dirname, 'view', 'Admin', 'header.html'), (err, header) => {
+                    //console.log(template.toString());
+                    let accueil = template.toString().replace('<header>%</header>', header.toString());
+                    modelCreneau.getProf().then((nom)=>{
+                            modelEvenement.getNbJury(req.params.id).then((nbJury)=>{
+                                let text = '<script>let nbJury =' + nbJury[0].nombreMembresJury +';let prof=`<option selected disabled value=""> Prof </option>'
+                                let string = JSON.parse(JSON.stringify(nom))
+                                for (let prof of string) {
+                                    text += '<option value="' + prof['id'] + '" >' + prof['nom'] +' '+ prof['prenom']+ '</option> ';
+                                }
+                                console.log(text);
+                                res.end(accueil.toString().replace('<prof></prof>', text+"`</script>"));
+                            }).catch((error) => {
+                                res.end("Probleme jury")
+                            })
+                    }).catch((error) => {
+                        res.end("Probleme prof")
+                    })
+                });
+            }
+            
+        });
+    }
+});
+
+router.all('/afficherSalleProf/:id', (req, res, next) => {
+    if (auth(req, res, next) !== 1) {
+        fs.readFile(path.join(__dirname, 'error', 'Admin', 'pasAdmin.html'), (err, template) => {
+            if (err)
+                throw err;
+            else
+                res.end(template);
+        });
+    } else {
+        let salle = recupParam(req, "salle");
+        let listeidProf = recupParam(req, "nom");
+        console.log("IDPROFFFF"+listeidProf);
+        console.log(req.params.id)
+        
+        modelCreneau.modifierSalle([salle,req.params.id])
+            .then((values) => { 
+                modelCreneau.modifierProf(req.params.id, listeidProf)
+                    .then((requete)=>{
+                        console.log("par la aussi ");
+                        console.log(requete);
+                        //res.writeHead(302, {'Location': '/addCreneau/:id'});
+                        res.end("end");
+                    })
+                    .catch(function (){
+                        console.log("liaison etudiants groupe");
+                        fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                            content = content.toString().replace('<header>%</header>', "");
+                            res.end(content);
+                        });
+                    });
+            })
+            .catch(function () {
+                console.log("création groupe");
+                fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                    content = content.toString().replace('<header>%</header>', "");
+                    res.end(content);
+                });
+        });
+        
     }
 });
 

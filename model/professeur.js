@@ -15,4 +15,24 @@ function getProfId (nom,prenom) {
         });
     });
 }
-module.exports = {getProfId};
+
+function getListeProf (nom) {
+    return new Promise((resolve, reject) => {
+        for (let i = 0; i < nom.length; ++i){
+            let idP = nom[i];
+            console.log(idP)
+            let sql = "SELECT id FROM `professeurs` WHERE nom LIKE  ? ;";
+            db.query(sql,idP,(err, result)=>{
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                } else {
+                    resolve(result);
+                    console.log(result);
+                }
+            });
+        }
+    });
+}
+
+module.exports = {getProfId , getListeProf};
