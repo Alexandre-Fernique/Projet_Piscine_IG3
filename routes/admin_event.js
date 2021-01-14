@@ -229,11 +229,7 @@ router.all('/addCreneau/:id', (req, res, next) => { //Affichage du planning pour
                             modelCreneau.getDureeCreneau(req.params.id).then((dureeCreneau)=> {
                                 console.log(nomEvent)
                                 let donne = "<script>let tampon=" + JSON.stringify(listEvent) + ";let ProfEvent=" + JSON.stringify(profEvent) + ";let dureeCreneau=" + JSON.stringify(dureeCreneau) + ";let eventID=" + JSON.stringify(nomEvent[0].id) + "</script>" //ajouter dureeCreneau : slotDuration
-<<<<<<< HEAD
                                 console.log(nomEvent[0].id + "_____________" + profEvent[0].id)
-=======
-
->>>>>>> 3ea548b362257c3b840a44b0423fa04bd26df8c5
                                 res.end(accueil.replace('<event></event>', donne).replace("%NOMEVENT%",htmlspecialchars(nomEvent[0].nom)))
                                 //ajout à la page html la liste des creneaux et la durée générale de tout les créneaux
                             }).catch(() => {
