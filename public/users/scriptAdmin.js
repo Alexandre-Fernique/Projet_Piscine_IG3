@@ -21,15 +21,15 @@ for (let event of tampon) {
     let prof ="";
     for (let i of ProfEvent)
     {
-        if(i.id===event.id)
+        if(i.id===event.id){
             prof+=i.nom+" "+i.prenom+", ";
-        prof="Jury: "+prof.substring(0,prof.length-2)
+        }
     }
     let data ={};
     data = {
         id: event.id,
-        //title: event.salle+" "+event.prof,
-        title: event.prof,
+        title: event.salle+" "+event.prof,
+        //title: event.prof,
         start: event.date.split("T")[0] + "T" + event.heureDebut,
         end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau)
     };

@@ -66,17 +66,10 @@ function modifierProf(values) {
     });
 }
 
-<<<<<<< HEAD
 function getEvent (idPromo) {
     return new Promise((resolve, reject) => {
         let sql = "SELECT `id`,`nom` FROM `evenements` WHERE anneePromo=? ";
         db.query(sql, idPromo,(err, result) => {
-=======
-function getEvent (anne) {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT `id`,`nom` FROM `evenements` WHERE anneePromo=? ";
-        db.query(sql, anne,(err, result) => {
->>>>>>> 3ea548b362257c3b840a44b0423fa04bd26df8c5
             if (err) {
                 console.log(err);
                 reject(err);
@@ -157,8 +150,4 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-<<<<<<< HEAD
-module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent, modifierProf ,modifierSalle}
-=======
-module.exports = {createCreneau ,modifier, getEvent, getGroupe , getDureeCreneau, clearByEvent,getIdLastCreate}
->>>>>>> 3ea548b362257c3b840a44b0423fa04bd26df8c5
+module.exports = {createCreneau ,modifier, getEvent, getGroupe , getCreneau,getDureeCreneau,getIdLastCreate, clearByEvent, modifierProf ,modifierSalle}

@@ -98,7 +98,7 @@ function getEvent(anne){
 //function getteur pour avoir les nom des prof associé au créneaux d'une promo
 function getProfEvent(anne){
     return new Promise(((resolve, reject) => {
-        let sql = "SELECT `creneaux`.`id`, `professeurs`.`nom`,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
+        let sql = "SELECT `creneaux`.`id`, `professeurs`.`id`,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
         db.query(sql, (err, result) => {
             if (err) {
                 reject(err);
