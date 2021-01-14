@@ -14,44 +14,91 @@ const modelComposer = require(path.join(__dirname,'..', 'model', 'composer'));
 router.all('/', (req, res, next) => { //Page d'accueil utilisateur
     let rang_utilisateur = auth(req, res, next);
     if (rang_utilisateur === 0) { // C'est un étudiant
-        fs.readFile(__dirname + '/view/User/creerGroupe.html', (err, template) => { //Page d'accueil -> étudiant connecté -> CreerGroupe
-            if (err)
-                throw err;
-            fs.readFile(__dirname + '/view/header.html', (err, header) => {
-                if (err)
-                    throw err;
-                let token = req.cookies['token'];
-                const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-                modelEtudiant.get("prenom", decodedToken["numeroEt"]).then((requete) => {
-                    //On ajoute Bonjour, <Prénom> dans l'entête
-                    let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
-                    //On ajoute l'entête dans notre page
-                    let groupe = template.toString().replace('<header>%</header>', headerPerso);
-                    //console.log(template.toString());
-                    modelEtudiant.get("anneePromo",decodedToken["numeroEt"]).then((annee)=>{
-                        let sql = "SELECT `nom` , `prenom`, `numero` FROM `etudiants` WHERE anneePromo ='"+ annee[0].anneePromo +"';";
-                        db.query(sql,(err, result)=> {
-                            if (err) throw err;
-                            let text = '<script>let etu=`<option selected disabled value=""> Etudiants </option>'
-                            let string = JSON.parse(JSON.stringify(result))
-                            for (let etudiant of string) {
-                                if (etudiant['numero']!=decodedToken["numeroEt"]){
-                                text += '<option value="' + etudiant['numero'] +'" >' + etudiant['nom'] +' '+ etudiant['prenom']+ '</option> ';
-                            }}
-                            console.log(text);
-                            console.log(result.toString().replace('<etudiant></etudiant>', text+"`</script>"));
-                            res.end(groupe.toString().replace('<etudiant></etudiant>', text+"`</script>"));
+        let token = req.cookies['token'];
+        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        modelEtudiant.getGrpId(decodedToken["numeroEt"]).then((grpId)=>{
+            //Si l'étu n'a pas de groupe page normal de création de groupe
+            if(grpId[0] === undefined){
+                fs.readFile(__dirname + '/view/User/creerGroupe.html', (err, template) => { //Page d'accueil -> étudiant connecté -> CreerGroupe
+                    if (err)
+                        throw err;
+                    fs.readFile(__dirname + '/view/header.html', (err, header) => {
+                        if (err)
+                            throw err;
+                        modelEtudiant.get("prenom", decodedToken["numeroEt"]).then((requete) => {
+                            //On ajoute Bonjour, <Prénom> dans l'entête
+                            let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
+                            //On ajoute l'entête dans notre page
+                            let groupe = template.toString().replace('<header>%</header>', headerPerso);
+                            //console.log(template.toString());
+                            modelEtudiant.get("anneePromo",decodedToken["numeroEt"]).then((annee)=>{
+                                let sql = "SELECT `nom` , `prenom`, `numero` FROM `etudiants` WHERE anneePromo ='"+ annee[0].anneePromo +"';";
+                                db.query(sql,(err, result)=> {
+                                    if (err) throw err;
+                                    let text = '<script>let etu=`<option selected disabled value=""> Etudiants </option>'
+                                    let string = JSON.parse(JSON.stringify(result))
+                                    for (let etudiant of string) {
+                                        if (etudiant['numero']!=decodedToken["numeroEt"]){
+                                            text += '<option value="' + etudiant['numero'] +'" >' + etudiant['nom'] +' '+ etudiant['prenom']+ '</option> ';
+                                        }}
+                                    console.log(text);
+                                    console.log(result.toString().replace('<etudiant></etudiant>', text+"`</script>"));
+                                    res.end(groupe.toString().replace('<etudiant></etudiant>', text+"`</script>"));
+                                });
+                            });
+                        }).catch((err) => {
+                            console.log(err);
+                            fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', "");
+                                res.end(content);
+                            });
                         });
                     });
-                }).catch((err) => {
-                    console.log(err);
-                    fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
-                        content = content.toString().replace('<header>%</header>', "");
-                        res.end(content);
-                    });
                 });
-            });
-        });
+
+            }else {
+                fs.readFile(__dirname + '/view/User/update_Groupe.html', (err, template) => {
+                    if (err)
+                        throw err;
+                    fs.readFile(__dirname + '/view/header.html', (err, header) => {
+                        if (err)
+                            throw err;
+                        modelEtudiant.get("prenom", decodedToken["numeroEt"]).then((requete) => {
+                            //On ajoute Bonjour, <Prénom> dans l'entête
+                            let headerPerso = header.toString().replace('%NOM%', requete[0].prenom);
+                            //On ajoute l'entête dans notre page
+                            let groupe = template.toString().replace('<header>%</header>', headerPerso);
+                            console.log(grpId[0].idGroupe)
+                            console.log(grpId)
+                            modelEtudiant.sameEtudiantGrp(grpId[0].idGroupe).then((etudiant)=>{
+                                modelGroup.getInfoGrp(grpId[0].idGroupe).then((info)=>{
+                                    let donne = "<script>let info=" + JSON.stringify(info) + ";let etudiant=" + JSON.stringify(etudiant) + ";</script>"
+                                    res.end(groupe.replace('<info></info>', donne))
+
+                                })
+
+                            })
+                        });
+                    });
+                })
+
+            }
+        })
+
+
+    }
+});
+router.all("/delete", (req, res, next) => {
+    let rang_utilisateur = auth(req, res, next);
+    if (rang_utilisateur === 0) { // C'est un étudiant
+        let token = req.cookies['token'];
+        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        modelEtudiant.removeGrp(decodedToken["numeroEt"]).catch(()=>{
+            res.end("problème")
+        })
+        console.log("A plus de groupe")
+        res.writeHead(302, {'Location': '/users'});
+        res.end("end");
     }
 });
 

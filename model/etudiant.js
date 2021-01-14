@@ -65,7 +65,30 @@ function changeCreneaux(id,idGroupe,annee){
 //fonction qui retourne les groupes associés au numéro de l'étudiant
 function getGrpId (num) {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT `idGroupe` FROM `composer` WHERE numeroEtudiant=" + num + ";";
+        let sql = "SELECT `idGroupe` FROM `composer` WHERE numeroEtudiant= ? ;";
+        db.query(sql,num, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
+function removeGrp(num){
+    return new Promise((reject) => {
+        let sql = "DELETE FROM `composer` WHERE numeroEtudiant= "+num+";";
+        db.query(sql,num, (err) => {
+            if (err) {
+                reject(err);
+            }
+        });
+    });
+}
+
+function sameEtudiantGrp(idgroupe){
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT nom, prenom FROM `composer`,`etudiants` WHERE numeroEtudiant=numero and idGroupe= "+idgroupe+" ;";
         db.query(sql, (err, result) => {
             if (err) {
                 reject(err);
@@ -98,7 +121,7 @@ function getEvent(anne){
 //function getteur pour avoir les nom des prof associé au créneaux d'une promo
 function getProfEvent(anne){
     return new Promise(((resolve, reject) => {
-        let sql = "SELECT `creneaux`.`id`, `professeurs`.`id`,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
+        let sql = "SELECT `creneaux`.`id`, `professeurs`.`nom`,`prenom` FROM `evenements`,`creneaux`,`participe`,`professeurs` WHERE evenements.id=idEvenement and creneaux.id=idCreneaux and idProfesseur= professeurs.id and anneePromo='" + anne + "';"
         db.query(sql, (err, result) => {
             if (err) {
                 reject(err);
@@ -163,4 +186,4 @@ function changeMail(oldMAil,newMail,num){
         })
     })
 }
-module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword,getProfEvent,changeMail };
+module.exports = {create, get,getEvent,getGrpId,changeCreneaux,changePassword,getProfEvent,changeMail,removeGrp,sameEtudiantGrp };

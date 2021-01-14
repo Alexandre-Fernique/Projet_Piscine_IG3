@@ -26,7 +26,6 @@ for (let event of tampon) {
         if(i.id===event.id)
             prof+=i.nom+" "+i.prenom+", ";
     }
-    console.log("FERGT5Y67J"+prof);
     if(prof!=="")
         prof="Jury: "+prof.substring(0,prof.length-2);
     if(IdProjet[0].idGroupe == event.idGroupeProjet){
