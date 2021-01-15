@@ -90,6 +90,20 @@ function getNbJury(idCreneau) {
         });
     });
 }
+function getAnneePromo(idCreneau) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT anneePromo FROM `evenements`,`creneaux` WHERE idEvenement = evenements.id AND creneaux.id=? ;";
+        db.query(sql, idCreneau ,(err, result) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    });
+}
+
 function getAllPromotionAvailable () {
     return new Promise((resolve, reject) => {
         let sql = "SELECT * FROM `promotion` promo WHERE promo.annee != 'Admin' AND promo.annee NOT IN ( SELECT e.anneePromo FROM evenements e)";
@@ -130,4 +144,4 @@ function getByPromo (toSelect, anneePromo) {
     })
 }
 
-module.exports = {create, update, getByPromotion, getNbJury ,getAll, getAllPromotionAvailable, clearByEvent, getByPromo ,getDateFinResa };
+module.exports = {create, update,getAnneePromo, getByPromotion, getNbJury ,getAll, getAllPromotionAvailable, clearByEvent, getByPromo ,getDateFinResa };

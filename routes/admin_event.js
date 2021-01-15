@@ -114,13 +114,23 @@ router.all('/afficherSalleProf/:id', (req, res, next) => {
             .then((values) => { 
                 modelCreneau.modifierProf(req.params.id, listeidProf)
                     .then((requete)=>{
-                        console.log("par la aussi ");
-                        console.log(requete);
-                        //res.writeHead(302, {'Location': '/addCreneau/:id'});
-                        res.end("end");
+                        modelEvenement.getAnneePromo(req.params.id).then((anneePromo)=> {
+                            console.log("par la aussi ");
+                            console.log(requete);
+                            //res.writeHead(302, {'Location': '/addCreneau/:id'});
+                            res.writeHead(302, {'Location': '/admin/evenement/addCreneau/'+anneePromo[0].anneePromo});
+                            res.end("end");
+                        })
+                        .catch(function (){
+                            console.log("liaison creneau anneepromo");
+                            fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                                content = content.toString().replace('<header>%</header>', "");
+                                res.end(content);
+                            });
+                        });
                     })
                     .catch(function (){
-                        console.log("liaison etudiants groupe");
+                        console.log("liaison creneau profs");
                         fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
                             content = content.toString().replace('<header>%</header>', "");
                             res.end(content);
