@@ -58,7 +58,6 @@ for (let event of tampon) {
             url: '/users/reservation/' + event.id
         };
     }
-    console.log(event.prof)
     liste.push(data);
 
 }

@@ -9,7 +9,8 @@ const auth = require(path.join(__dirname, '..', 'bin', 'auth')); // Permet la ge
 const recupParam = require(path.join(__dirname, '..', 'bin', 'paramRecup'));
 
 const modelEtudiant = require(path.join(__dirname, '..', 'model', 'etudiant'));
-
+const modelCreneaux = require(path.join(__dirname, '..', 'model', 'creneaux'));
+const modelGroup = require(path.join(__dirname, '..', 'model', 'groupeProjet'));
 // La clé nous permet de renfocer les mots de passes qui peuvent être considéré comme "faible"
 //ici, le mot de passe "lapin" devient "96706546lapin"
 var cle = "96706546"; // Il faudra sécuriser l'accès avec un fichier externe vérouillé
@@ -207,5 +208,24 @@ router.get('/afficher/:id',(req,res,next)=>{
     })
 
 });
+router.get('/creneaux/:id',(req,res,next)=>{
+    fs.readFile(__dirname + '/view/accueil/creneaux.html', (err, template) => {
+        if (err)
+            throw err;
+        modelCreneaux.getGroupeCreneaux(req.params.id).then((grpId)=>{
+            console.log(grpId[0].idGroupeProjet)
+            console.log(grpId)
+            modelEtudiant.sameEtudiantGrp(grpId[0].idGroupeProjet).then((etudiant)=>{
+                modelGroup.getInfoGrp(grpId[0].idGroupeProjet).then((info)=>{
+                    let donne = "<script>let info=" + JSON.stringify(info) + ";let etudiant=" + JSON.stringify(etudiant) + ";</script>"
+                    res.end(template.toString().replace('<info></info>', donne))
+
+                })
+
+            })
+        });
+        })
+});
+
 
 module.exports = router;

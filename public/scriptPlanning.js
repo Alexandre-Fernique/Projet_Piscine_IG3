@@ -27,12 +27,22 @@ for (let event of tampon) {
     }
     if(prof!=="")
         prof="Jury: "+prof.substring(0,prof.length-2);
-    data = {
-        id: event.id,
-        title: event.salle+" "+prof,
-        start: event.date.split("T")[0] + "T" + event.heureDebut,
-        end:event.date.split("T")[0] + "T"+addTime(event.heureDebut,event.dureeCreneau),
-    };
+    if (event.idGroupeProjet!=null) {
+        data = {
+            id: event.id,
+            title: event.salle + " Clique pour plus d'info " + prof,
+            start: event.date.split("T")[0] + "T" + event.heureDebut,
+            end: event.date.split("T")[0] + "T" + addTime(event.heureDebut, event.dureeCreneau),
+            url: "/creneaux/" + event.id,
+        };
+    }else {
+        data = {
+            id: event.id,
+            title: event.salle + " " + prof,
+            start: event.date.split("T")[0] + "T" + event.heureDebut,
+            end: event.date.split("T")[0] + "T" + addTime(event.heureDebut, event.dureeCreneau),
+        };
+    }
     console.log(event.prof)
     liste.push(data);
 }

@@ -117,6 +117,20 @@ function getGroupe(idGroupe) {
         });
     });
 }
+function getGroupeCreneaux(idGroupe) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT idGroupeProjet FROM `creneaux` WHERE id= ? ";
+        db.query(sql,idGroupe, (err, result) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else {
+                console.log(result);
+                resolve(result);
+            }
+        });
+    });
+}
 
 function getDureeCreneau(idCreneau) {
     return new Promise((resolve, reject) => {
@@ -145,6 +159,7 @@ function getProf(){
         });
     }))
 }
+
 function clearByEvent (idEvenement) {
     return new Promise(((resolve, reject) => {
         let sql = "DELETE " +
@@ -166,4 +181,4 @@ function clearByEvent (idEvenement) {
     }));
 }
 
-module.exports = {createCreneau , getProf,modifier, getEvent, getGroupe , getCreneau,getDureeCreneau,getIdLastCreate, clearByEvent, modifierProf ,modifierSalle}
+module.exports = {createCreneau , getProf,modifier, getEvent, getGroupe ,getGroupeCreneaux, getCreneau,getDureeCreneau,getIdLastCreate, clearByEvent, modifierProf ,modifierSalle}
