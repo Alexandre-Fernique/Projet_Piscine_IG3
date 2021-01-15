@@ -361,7 +361,20 @@ router.post('/createCreneau', (req, res, next) => { //Creer un creneau pour un e
 
         modelCreneau.createCreneau([date, heureDebut, id])
             .then((retour) => {
-                res.end("OK");
+                modelEvenement.getAnneePromo(req.params.id).then((anneePromo)=> {
+                    console.log("par la aussi ");
+                    console.log(requete);
+                    //res.writeHead(302, {'Location': '/addCreneau/:id'});
+                    res.writeHead(302, {'Location': '/admin/evenement/addCreneau/'+anneePromo[0].anneePromo});
+                    res.end("end");
+                })
+                .catch(function (){
+                    console.log("liaison creneau anneepromo");
+                    fs.readFile(path.join(__dirname, 'error', 'pbBDD.html'), (err, content) => {
+                        content = content.toString().replace('<header>%</header>', "");
+                        res.end(content);
+                    });
+                });
             })
             .catch(
                 function () {
